@@ -99,7 +99,7 @@ def create_test_data():
 	create_suppliers(settings)
 	create_customers(settings)
 	create_items(settings)
-	# create_specifications(settings)
+	create_specifications(settings)
 	create_boms(settings)
 	prod_plan_from_doc = "Sales Order"
 	if prod_plan_from_doc == "Sales Order":

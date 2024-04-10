@@ -2,10 +2,11 @@
 	<div>
 		<h5> {{ attribute_name }}</h5>
 		<div>
-			<div class="min-max-inputs">
+			<span class="min-max-inputs">
 				<input class="form-control form-input" type="date" v-model="minFilterValue" @change="change">
-				<input class="form-control form-input" type="date" v-model="maxFilterValue" @change="change">
-			</div>
+				&nbsp;
+				<input class="form-control form-input " type="date" v-model="maxFilterValue" @change="change">
+			</span>
 		</div>
 	</div>
 </template>
@@ -40,13 +41,12 @@ export default {
 </script>
 <style scoped>
 .min-max-inputs {
-	display: inline;
+	display: flex;
 	white-space: nowrap;
 }
 
 .min-max-inputs input {
-
-	width: 20ch;
+	width: 17ch;
 	text-align: right;
 }
 

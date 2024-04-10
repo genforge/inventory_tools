@@ -1,11 +1,13 @@
 <template>
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
 		<li class="sidebar-label" v-for="(comp, idx) in searchComponents" :key="idx">
+		<hr>
+		<B> {{comp.attribute_name}} </B>
 			<component
+				class="scrollable-filter"
 				:is="comp.component"
 				:values="comp.values"
 				:attribute_id="comp.attribute_id"
-				:attribute_name="comp.attribute_name"
 				@update_filters="updateFilters($event)"
 			></component>
 	</li>
@@ -145,5 +147,33 @@ export default {
 <style scoped>
 .faceted-search-box {
 	min-height: 25rem;
+}
+
+.scrollable-filter {
+	max-height: 7rem;
+	overflow-y: auto;
+	margin-bottom: 1rem;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 7px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--gray-700); 
+  border-radius: 7px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
 </style>
