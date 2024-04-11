@@ -1,15 +1,26 @@
 <template>
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
 		<li class="sidebar-label" v-for="(comp, idx) in searchComponents" :key="idx">
+		<div class="pointer" @click="showHideFilters(idx)">
+			<B> {{ comp.attribute_name }} </B>
+			<svg class="icon icon-sm float-right">
+				<use href="#icon-small-down"
+					v-if="!comp.visible"
+				></use>
+				<use href="#icon-small-up"
+					v-if="comp.visible"
+				></use>
+			</svg>
+		</div>
+		<component
+			class="scrollable-filter"
+			:is="comp.component"
+			:values="comp.values"
+			:attribute_id="comp.attribute_id"
+			v-if="comp.visible"
+			@update_filters="updateFilters($event)"
+		></component>
 		<hr>
-		<B> {{comp.attribute_name}} </B>
-			<component
-				class="scrollable-filter"
-				:is="comp.component"
-				:values="comp.values"
-				:attribute_id="comp.attribute_id"
-				@update_filters="updateFilters($event)"
-			></component>
 	</li>
 </ul>
 </template>
@@ -29,6 +40,9 @@ export default {
 		})
 	},
 	methods: {
+		showHideFilters(idx) {
+			this.searchComponents[idx].visible = ! this.searchComponents[idx].visible
+		},
 		updateFilters(values){
 			if('sort_order' in values){
 				this.sortOrder = values
@@ -155,9 +169,13 @@ export default {
 	margin-bottom: 1rem;
 }
 
+.pointer {
+	cursor: pointer;
+}
+
 /* width */
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 11px;
 }
 
 /* Track */
@@ -176,4 +194,14 @@ export default {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--primary);
 }
+
+@-moz-document url-prefix() {
+	.scrollable-filter {
+    	scrollbar-width: thin; /* Set the width of the scrollbar */
+    	scrollbar-color: var(--gray-700) #eee; /* Set the color of the scrollbar thumb and track */
+	}
+	.scrollable-filter:hover {
+    	scrollbar-color: var(--primary) #eee;
+	}
+ }
 </style>

@@ -45,6 +45,7 @@ def show_faceted_search_components(doctype="Item", filters=None):
 			)
 		else:
 			attribute.values = values
+		attribute.visible = False
 
 	return attributes
 
