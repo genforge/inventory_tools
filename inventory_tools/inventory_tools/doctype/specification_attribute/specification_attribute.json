@@ -28,6 +28,7 @@
   {
    "columns": 1,
    "default": "0",
+   "depends_on": "eval: !doc.date_values",
    "fieldname": "numeric_values",
    "fieldtype": "Check",
    "label": "Numeric Values"
@@ -64,11 +65,13 @@
   },
   {
    "fieldname": "component",
-   "fieldtype": "Data",
-   "label": "Component"
+   "fieldtype": "Select",
+   "label": "Component",
+   "options": "AttributeFilter\nFacetedSearchColorPicker\nFacetedSearchDateRange\nFacetedSearchNumericRange"
   },
   {
    "default": "0",
+   "depends_on": "eval: !doc.numeric_values",
    "fieldname": "date_values",
    "fieldtype": "Check",
    "label": "Date Values"
@@ -78,7 +81,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-12-13 14:10:35.306962",
+ "modified": "2024-04-11 07:50:09.799568",
  "modified_by": "Administrator",
  "module": "Inventory Tools",
  "name": "Specification Attribute",
