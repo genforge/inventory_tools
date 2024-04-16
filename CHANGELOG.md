@@ -2,6 +2,132 @@
 
 
 
+## v14.3.0 (2024-03-01)
+
+### Feature
+
+* feat: Alternative workstation in job card and operation (#56)
+
+* feat: New field and link filters to select alternative workstation
+
+* fix: add alternativ workstation in fixture
+
+* fix:change alternative workstation in fixture
+
+* change to error key function
+
+* fix: set validation on workstation if not operation
+
+* changes field name in testcase
+
+* fix: change a class base function to saperate function
+
+* added a searchfield in query
+
+* added a searchfield in query
+
+* added a searchfield in query
+
+* added a searchfield in query
+
+* added a searchfield in query
+
+* feat: validation to not allow default workstation in alternative
+
+* added comment on function ([`0788d3c`](https://github.com/agritheory/inventory_tools/commit/0788d3caa67ad7820a5a3cdfdc950c85bd6f0cd7))
+
+### Unknown
+
+* Prompt Material Transfer upon Completion of Manufacturing Stock Entry (#51)
+
+* feat: wip stock entry next action
+
+* feat: improve message
+
+* fix: on_submit hook
+
+* fix: parameter hardcoded
+
+* feat: change wording ([`d1e126b`](https://github.com/agritheory/inventory_tools/commit/d1e126b8dbaf09370f6d4c173e24af33ac994bd7))
+
+
+## v14.2.0 (2024-02-01)
+
+### Feature
+
+* feat: manufacturing over/under production
+
+* feat: WIP Manufacturing Over/Under Production
+
+* feat: WIP Manufacturing Over/Under Production
+
+* feat: WIP Manufacturing Over/Under Production
+
+* fix: unused import
+
+* feat: override onload for work order
+
+* feat: oveeride get_pending_raw_materials
+
+* fix: allowed_qty in job card
+
+* fix: indentation
+
+* fix: import
+
+* fixes
+
+* wip: tests
+
+* feat: test_get_allowance_percentage
+
+* feat: test test_validate_finished_goods
+
+* fix: validate_job_card and test
+
+* fix: test ([`baeb469`](https://github.com/agritheory/inventory_tools/commit/baeb4690d42429a062595eb9058ddd2770b190c9))
+
+### Unknown
+
+* Make Creation of Job Card(s) on Submit of Work Order configurable (#49)
+
+* feat: configurable creation of job card
+
+* feat: configurable creation of job card ([`5bf9486`](https://github.com/agritheory/inventory_tools/commit/5bf94860c58d81faccb1106828f16121c081871a))
+
+
+## v14.1.3 (2024-01-04)
+
+### Fix
+
+* fix: validate customizations (#35)
+
+* fix: validate customizations
+
+* fix: only install inventory tools customizations ([`e1d86a0`](https://github.com/agritheory/inventory_tools/commit/e1d86a0739e56f3b987b599c275644ee5c29fc0a))
+
+
+## v14.1.2 (2023-09-12)
+
+### Chore
+
+* chore: remove console.log ([`f82b590`](https://github.com/agritheory/inventory_tools/commit/f82b590d061608818170092f07e3da8d9153b756))
+
+### Ci
+
+* ci: update release action user and email (#32) ([`4264bdd`](https://github.com/agritheory/inventory_tools/commit/4264bdde25c0bff1390923e7f18fce7c353844db))
+
+### Fix
+
+* fix: make uom enforcement respond better to toggle on/off ([`3734cb4`](https://github.com/agritheory/inventory_tools/commit/3734cb42e880168bb4c4a71c67820da63857e0bf))
+
+### Unknown
+
+* Merge pull request #33 from agritheory/uom_enforcement_fix
+
+fix: make uom enforcement respond better to toggle on/off ([`13ad883`](https://github.com/agritheory/inventory_tools/commit/13ad8832a346799563e0f7ae2f1b20c457d10d5c))
+
+
 ## v14.1.1 (2023-08-30)
 
 ### Fix

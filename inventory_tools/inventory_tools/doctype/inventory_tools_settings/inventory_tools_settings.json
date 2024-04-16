@@ -15,6 +15,12 @@
   "work_order_subcontracting_section",
   "enable_work_order_subcontracting",
   "create_purchase_orders",
+  "bom_column",
+  "create_job_cards_automatically",
+  "column_break_ilobm",
+  "overproduction_percentage_for_work_order",
+  "section_break_0",
+  "update_warehouse_path",
   "section_break_gzcbr",
   "update_warehouse_path",
   "uoms_section",
@@ -93,6 +99,27 @@
    "label": "Enforce UOMs"
   },
   {
+   "fieldname": "bom_column",
+   "fieldtype": "Section Break",
+   "label": "Work Order"
+  },
+  {
+   "default": "Yes",
+   "fieldname": "create_job_cards_automatically",
+   "fieldtype": "Select",
+   "label": "Create Job Card(s) Automatically",
+   "options": "Yes\nNo"
+  },
+  {
+   "fieldname": "column_break_ilobm",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "overproduction_percentage_for_work_order",
+   "fieldtype": "Percent",
+   "label": "Overproduction Percentage For Work Order"
+  },
+  {
    "fieldname": "landed_costing_section",
    "fieldtype": "Section Break",
    "label": "Landed Costing"
@@ -106,7 +133,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-08-24 15:52:38.320728",
+ "modified": "2024-01-11 10:10:57.356068",
  "modified_by": "Administrator",
  "module": "Inventory Tools",
  "name": "Inventory Tools Settings",
