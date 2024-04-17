@@ -4,7 +4,7 @@ frappe.ui.form.on('Job Card', {
 			set_workstation_query(frm)
 		}
 		if (frm.doc.docstatus == 1) {
-			add_swith_work_order_action(frm)
+			add_switch_work_order_action(frm)
 		}
 	},
 	operation: frm => {
@@ -23,7 +23,7 @@ function set_workstation_query(frm) {
 	})
 }
 
-function add_swith_work_order_action(frm) {
+function add_switch_work_order_action(frm) {
 	frm.add_custom_button(
 		__('Switch Work Order'),
 		function () {
