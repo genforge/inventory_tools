@@ -159,6 +159,17 @@
    "fieldtype": "Link",
    "label": "Aggregated Sales Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "job_card_section",
+   "fieldtype": "Section Break",
+   "label": "Job Card"
+  },
+  {
+   "default": "0",
+   "fieldname": "allow_switch_work_order",
+   "fieldtype": "Check",
+   "label": "Allow Switch Work Order"
   }
  ],
  "index_web_pages_for_search": 1,
