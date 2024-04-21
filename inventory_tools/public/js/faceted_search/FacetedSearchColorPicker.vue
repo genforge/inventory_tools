@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<h5>{{ attribute_name }}</h5>
 		<div class="colorpicker">
 			<div v-for="(attr, idx) in selectedValues" :key="idx" class="color-card" @click="selectColor(attr, idx)">
 				<div class="color-display" :style="getBackground(attr)">

@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<h5> {{ attribute_name }}</h5>
 		<div>
 			<span class="min-max-inputs">
 				<input class="form-control form-input" type="date" v-model="minFilterValue" @change="change">

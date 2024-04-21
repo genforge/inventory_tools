@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<h5>{{ attribute_name }}</h5>
 		<div v-for="(attr, idx) in selectedValues" :key="idx">
 			<input type="checkbox" v-model="attr.isChecked" @change="change" />
 			<span> {{ attr.attribute }}</span>

@@ -2,7 +2,7 @@
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
 		<li class="sidebar-label" v-for="(comp, idx) in searchComponents" :key="idx">
 		<div class="pointer" @click="showHideFilters(idx)">
-			<B> {{ comp.attribute_name }} </B>
+			<B class="filrer-title"> {{ comp.attribute_name }} </B>
 			<svg class="icon icon-sm float-right">
 				<use href="#icon-small-down"
 					v-if="!comp.visible"
@@ -17,6 +17,7 @@
 			:is="comp.component"
 			:values="comp.values"
 			:attribute_id="comp.attribute_id"
+			:attribute_name="comp.attribute_name"
 			v-if="comp.visible"
 			@update_filters="updateFilters($event)"
 		></component>
@@ -159,6 +160,11 @@ export default {
 }
 </script>
 <style scoped>
+
+.filrer-title {
+	font-size: 1.25rem
+}
+
 .faceted-search-box {
 	min-height: 25rem;
 }

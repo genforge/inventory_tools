@@ -17,12 +17,13 @@ Follow the steps to create your first listed product which allows multiple speci
 ![Screen shot of ](./assets/publish_in_website.PNG)
 
 5. Create Specifications for the Item:
-   1. Typee `Specification` in Awesomebar > `Add Specification`.
+   1. Type `Specification` in Awesomebar > `Add Specification`.
    2. Select `DocType` on which you would like to customize the specification.
    3. Select `Apply On` based on the doctype.
    4. Mark it `Enabled`.
-   5. Under `Attributes` table click `Add Row` > `Edit`.
 ![Screen shot of ](./assets/specification.PNG)
+
+   5. Under `Attributes` table click `Add Row` > `Edit`.
 
       - Write unique `Attribute Name`.
       - Choose if the value is expected to be a `Date Value` or `Numeric Value`.

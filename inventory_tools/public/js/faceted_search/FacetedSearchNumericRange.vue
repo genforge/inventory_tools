@@ -1,6 +1,5 @@
 <template>
 <div>
-	<h5> {{ attribute_name }}</h5>
 	<div>
 		<div class="min-max-inputs">
 			<input class="form-control form-input" type="text" v-model="minFilterValue"
