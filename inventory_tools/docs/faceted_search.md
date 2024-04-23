@@ -1,11 +1,11 @@
 
 # Faceted Search
 
-An Inventory Tools for ERPNext. This allows user to list their product under `/all-products` and filter them with their specification
+Faceted search works on top of ERPNext's shopping cart to add additional e-commerce controls for marketplace users. This feature allows you to list your products under `/all-products` and filter them based on their specifications.
 
 # Manual Setup
 
-Follow the steps to create your first listed product which allows multiple specification and it's variations.
+Follow the steps to create your first listed product with multiple specifications and their variations.
 
 ### Steps:
 
@@ -28,23 +28,25 @@ Follow the steps to create your first listed product which allows multiple speci
       - Write unique `Attribute Name`.
       - Choose if the value is expected to be a `Date Value` or `Numeric Value`.
       - Select `Apply On` (In this case, we can choose `Item`).
-      - Select the `Field` on which this should be applied (Can be left empty).
-      - Choose `Component` based one following explainations:
+      - Optionally select the `Field` on which the attribute should be applied.
+      - Choose a `Component` based on the following criteria:
         
-          1. `FacetedSearchColorPicker` If the Attribute is related to the colors.
-          2. `FacetedSearchDateRange` If the Attribute is related to the Date values.
-          3. `FacetedSearchNumericRange` If the Attribute is related to the Numeric values.
-          4. `AttributeFilter` If any other the mentioned above.
+          1. `FacetedSearchColorPicker`: if the attribute is related to colors.
+          2. `FacetedSearchDateRange`: if the attribute is related to date values.
+          3. `FacetedSearchNumericRange`: if the attribute is related to numeric values.
+          4. `AttributeFilter`: if the attribute doesn't belong to any of the above.
 ![Screen shot of ](./assets/specification_attribute.PNG)
 
-      - `Save` Specifications.
+      - `Save` the Specification(s).
 7. Create `Specification Values`:
    - Route through `Stock` > `Item` > Choose Item.
-   - On Item page click `Actions` (Top Right) >  Click `Edit Specification` (This will prepopulate the specifications based on your selection, If not please select from the dropdown)
+   - On Item page click `Actions` (Top Right) >  Click `Edit Specification`
+      - This will try to pre-populate the specifications based on your selection. If no specifications are set, please select from the dropdown instead.
    - `Save`
 ![Screen shot of ](./assets/edit_specifications.PNG)
+
 
 This is how you can create and manage your specification. you can go to `/all-products`, you will see listed Item and Filter(s) on left.
 
 ### Note:
-`Specification` and `Specification Values` are reusable as far as the grouping of Items are done correctly, you may want to create new specification for different type goods.
+`Specification` and `Specification Values` are reusable as long as the grouping of items is done correctly. You may want to create new specifications for different types of goods.
