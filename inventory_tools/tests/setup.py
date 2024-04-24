@@ -11,8 +11,7 @@ from erpnext.manufacturing.doctype.production_plan.production_plan import (
 from erpnext.setup.utils import enable_all_roles_and_domains, set_defaults_for_tests
 from erpnext.stock.get_item_details import get_item_details
 from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
-from frappe.utils import add_months, nowdate
-from frappe.utils.data import flt, getdate
+from frappe.utils.data import add_months, flt, getdate, nowdate
 
 from inventory_tools.tests.fixtures import (
 	attributes,
@@ -99,7 +98,6 @@ def create_test_data():
 	create_suppliers(settings)
 	create_customers(settings)
 	create_items(settings)
-	create_specifications(settings)
 	create_boms(settings)
 	prod_plan_from_doc = "Sales Order"
 	if prod_plan_from_doc == "Sales Order":
@@ -109,6 +107,7 @@ def create_test_data():
 	create_production_plan(settings, prod_plan_from_doc)
 	create_fruit_material_request(settings)
 	create_quotations(settings)
+	create_specifications(settings)
 
 
 def create_suppliers(settings):
@@ -296,7 +295,8 @@ def create_items(settings):
 		i.valuation_rate = item.get("valuation_rate") or 0
 		i.is_sub_contracted_item = item.get("is_sub_contracted_item") or 0
 		i.default_warehouse = settings.get("warehouse")
-		i.weight_uom = "Pound" if i.is_stock_item else None
+		i.weight_uom = item.get("weight_uom", "Pound") if i.is_stock_item else None
+		i.weight_per_unit = item.get("weight_per_unit")
 		i.default_material_request_type = (
 			"Purchase"
 			if item.get("item_group") in ("Bakery Supplies", "Ingredients")
@@ -317,8 +317,6 @@ def create_items(settings):
 		i.sales_uom = "Nos" if i.is_sales_item else None
 		i.shelf_life_in_days = 7 if i.is_sales_item else None
 		i.brand = "Ambrosia Pie Co" if i.is_sales_item else None
-		i.weight_per_unit = 32 * 4 if i.is_sales_item else None
-		i.weight_uom = "Ounce" if i.is_sales_item else None
 		i.append(
 			"item_defaults",
 			{
@@ -642,7 +640,7 @@ def create_production_plan(settings, prod_plan_from_doc):
 			job_card = frappe.get_doc("Job Card", job_card)
 			job_card.time_logs[0].completed_qty = wo.qty
 			job_card.save()
-			job_card.submit()  # don't submit to test alternative workstations
+			job_card.submit()
 
 
 def create_fruit_material_request(settings):
@@ -783,6 +781,8 @@ def create_specifications(settings=None):
 		("Purple", "#8684FF"),
 		("Green", "#8CCF54"),
 		("Yellow", "#FFFF00"),
+		("White", "#EEEEEE"),
+		("Black", "#1111111"),
 	):
 		if not frappe.db.exists("Color", c[0]):
 			color = frappe.new_doc("Color")
@@ -791,18 +791,14 @@ def create_specifications(settings=None):
 			color.save()
 
 	for spec in specifications:
-		if frappe.db.exists("Specification", {"title": f"{spec.get('dt')} - {spec.get('apply_on')}"}):
-			s = frappe.get_doc("Specification", {"title": f"{spec.get('dt')} - {spec.get('apply_on')}"})
+		if frappe.db.exists("Specification", spec.get("name")):
+			s = frappe.get_doc("Specification", spec.get("name"))
 		else:
 			s = frappe.new_doc("Specification")
+			s.name = spec.get("name")
 			s.dt = spec.get("dt")
 			s.apply_on = spec.get("apply_on")
 			s.enabled = spec.get("enabled")
 			for at in spec.get("attributes"):
 				s.append("attributes", at)
 			s.save()
-
-		spec_items = frappe.get_all("Item", {"item_group": "Baked Goods"})
-		for spec_item in spec_items:
-			spec_item = frappe.get_doc("Item", spec_item)
-			s.create_linked_values(spec_item, attributes[spec_item.name])

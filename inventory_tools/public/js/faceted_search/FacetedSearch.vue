@@ -1,29 +1,24 @@
 <template>
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
 		<li class="sidebar-label" v-for="(comp, idx) in searchComponents" :key="idx">
-		<div class="pointer" @click="showHideFilters(idx)">
-			<B class="filrer-title"> {{ comp.attribute_name }} </B>
-			<svg class="icon icon-sm float-right">
-				<use href="#icon-small-down"
-					v-if="!comp.visible"
-				></use>
-				<use href="#icon-small-up"
-					v-if="comp.visible"
-				></use>
-			</svg>
-		</div>
-		<component
-			class="scrollable-filter"
-			:is="comp.component"
-			:values="comp.values"
-			:attribute_id="comp.attribute_id"
-			:attribute_name="comp.attribute_name"
-			v-if="comp.visible"
-			@update_filters="updateFilters($event)"
-		></component>
-		<hr>
-	</li>
-</ul>
+			<div class="pointer" @click="toggleFilters(idx)">
+				<B> {{ comp.attribute_name }} </B>
+				<svg class="icon icon-sm float-right">
+					<use href="#icon-small-down" v-show="!comp.visible"></use>
+					<use href="#icon-small-up" v-show="comp.visible"></use>
+				</svg>
+			</div>
+			<component
+				class="scrollable-filter"
+				:is="comp.component"
+				:values="comp.values"
+				:attribute_name="comp.attribute_name"
+				:attribute_id="comp.attribute_id"
+				v-show="comp.visible"
+				@update_filters="updateFilters($event)"></component>
+			<hr />
+		</li>
+	</ul>
 </template>
 <script>
 // import { getSearchComponents } from './api.js'
@@ -37,11 +32,11 @@ export default {
 	},
 	mounted(){
 		frappe.ready(() => {
-			this.loadAttributeFilters()
+			this.loadFacetComponents()
 		})
 	},
 	methods: {
-		showHideFilters(idx) {
+		toggleFilters(idx) {
 			this.searchComponents[idx].visible = ! this.searchComponents[idx].visible
 		},
 		updateFilters(values){
@@ -55,7 +50,7 @@ export default {
 				this.setFilterValues()
 			}, 300)
 		},
-		loadAttributeFilters(){
+		loadFacetComponents(){
 			frappe.call({
 				method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
 				args: { 'doctype': 'Item', 'filters': this.filterValues },
@@ -63,9 +58,17 @@ export default {
 			},
 			).then(r => {
 				this.searchComponents = r.message
-				r.message.forEach(attributeFilter => {
-					this.filterValues[attributeFilter.attribute_name] = []
-				})
+				for (const [key, value] of Object.entries(r.message)) {
+					this.filterValues[key.value] = []
+					if (value.attribute_name in Object.fromEntries(params)) {
+						this.updateFilters({
+							attribute_name: value.attribute_name,
+							attribute_id: value.attribute_id,
+							values: [params.get(value.attribute_name)],
+						})
+						params.delete(value.attribute_name)
+					}
+				}
 			})
 		},
 		setFilterValues(){
@@ -186,13 +189,13 @@ export default {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey; 
+  box-shadow: inset 0 0 5px grey;
   border-radius: 7px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-700); 
+  background: var(--gray-700);
   border-radius: 7px;
 }
 

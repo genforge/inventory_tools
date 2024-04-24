@@ -40,7 +40,7 @@
    "mandatory_depends_on": null,
    "modified": "2024-02-22 10:20:21.468031",
    "modified_by": "Administrator",
-   "module": null,
+   "module": "Inventory Tools",
    "name": "Color-image",
    "no_copy": 0,
    "non_negative": 0,

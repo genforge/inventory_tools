@@ -7,9 +7,6 @@ import FacetedSearchColorPicker from './FacetedSearchColorPicker.vue'
 frappe.provide('faceted_search')
 
 faceted_search.mount = el => {
-	// if (faceted_search.$search && faceted_search.$search._isVue) {
-	// 	return
-	// }
 	faceted_search.$search = new window.Vue({
 		el: el,
 		render: h => h(FacetedSearch, { props: { doctype: 'Item' } }),

@@ -3,9 +3,9 @@
 		<div class="colorpicker">
 			<div v-for="(attr, idx) in selectedValues" :key="idx" class="color-card" @click="selectColor(attr, idx)">
 				<div class="color-display" :style="getBackground(attr)">
-					<p :style="{ 'color': attr.isChecked ? contrast(attr.attribute.color) : 'transparent' }">✓</p>
+					<p :style="{ 'color': attr.isChecked ? contrast(attr.attribute[1]) : 'transparent' }">✓</p>
 				</div>
-				<span> {{ attr.attribute.name }} </span>
+				<span> {{ attr.attribute[0] }} </span>
 			</div>
 		</div>
 	</div>
@@ -25,7 +25,7 @@ export default {
 				attribute_id: this.attribute_id,
 				values: this.selectedValues
 					.map(r => {
-						return r.isChecked ? r.attribute.name : null
+						return r.isChecked ? r.attribute[0] : null
 					})
 					.filter(r => {
 						return r != null
@@ -37,10 +37,10 @@ export default {
 			this.change()
 		},
 		getBackground(attr) {
-			if (attr.attribute.image != undefined) {
-				return { 'background-image': `url("${attr.attribute.image}")` }
+			if (attr.attribute[2] != undefined) {
+				return { 'background-image': `url("${attr.attribute[2]}")` }
 			} else {
-				return { 'background-color': attr.attribute.color }
+				return { 'background-color': attr.attribute[1] }
 			}
 		},
 		contrast(color) {

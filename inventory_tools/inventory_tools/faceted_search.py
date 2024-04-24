@@ -13,19 +13,32 @@ def show_faceted_search_components(doctype="Item", filters=None):
 	attributes = frappe.get_all(
 		"Specification Attribute",
 		{"applied_on": doctype},
-		["component", "attribute_name", "numeric_values", "date_values", "name AS attribute_id"],
+		[
+			"component",
+			"attribute_name",
+			"numeric_values",
+			"date_values",
+			"name AS attribute_id",
+		],
 		order_by="idx ASC",
 	)
+	components = {
+		attribute.attribute_name: {**attribute, "values": set(), "visible": False}
+		for attribute in attributes
+	}
 
 	for attribute in attributes:
-		values = list(
-			set(
-				frappe.get_all(
-					"Specification Value",
-					{"attribute": attribute.attribute_name, "reference_doctype": doctype},
-					pluck="value",
+		values = sorted(
+			list(
+				set(
+					frappe.get_all(
+						"Specification Value",
+						{"attribute": attribute.attribute_name, "reference_doctype": doctype},
+						pluck="value",
+					)
 				)
-			)
+			),
+			key=lambda x: x or "",
 		)
 		if attribute.numeric_values and values:
 			_values = [flt(v) for v in values]
@@ -35,19 +48,20 @@ def show_faceted_search_components(doctype="Item", filters=None):
 			_values = [localtime(int(flt(v))) for v in values]
 			_min, _max = min(_values), max(_values)
 		elif attribute.component == "FacetedSearchColorPicker":
-			attribute.values = frappe.get_all(
-				"Color",
-				[
-					"name",
-					"color",
-				],
-				order_by="name",
-			)
-		else:
-			attribute.values = values
-		attribute.visible = False
-
-	return attributes
+			values = [
+				tuple(r.values())
+				for r in frappe.get_all(
+					"Color",
+					[
+						"name",
+						"color",
+						"image",
+					],
+					order_by="name",
+				)
+			]
+		[components[attribute.attribute_name]["values"].add(value) for value in values]
+	return components
 
 
 sort_order_lookup = {
