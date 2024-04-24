@@ -1,0 +1,25 @@
+{
+	"name": "inventory_tools",
+	"license": "MIT",
+	"scripts": {
+		"build": "vite build --config=./inventory_tools/public/js/vite.config.js",
+		"dev": "vite build --watch --config=./inventory_tools/public/js/vite.config.js"
+	},
+	"dependencies": {
+		"@vueuse/core": "^10.9.0",
+		"vue": "^3.3.10"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^4.0.0",
+		"frappe-ui": "^0.0.105",
+		"vite": "^4.0.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/agritheory/inventory_tools.git"
+	},
+	"publishConfig": {
+		"access": "restricted"
+	},
+	"private": true
+}

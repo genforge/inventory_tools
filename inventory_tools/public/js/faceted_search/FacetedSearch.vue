@@ -21,7 +21,8 @@
 	</ul>
 </template>
 <script>
-// import { getSearchComponents } from './api.js'
+import { watchDebounced } from '@vueuse/core'
+
 frappe.provide('erpnext')
 
 export default {
@@ -45,10 +46,12 @@ export default {
 			} else {
 				this.filterValues[values.attribute_name] = { attribute_id: values.attribute_id, values: values.values}
 			}
-			// need to debounce here instead of timeout
-			setTimeout(() => {
-				this.setFilterValues()
-			}, 300)
+			watchDebounced(
+				this.filterValues,
+				() => { console.log('changed!'); this.setFilterValues() },
+				{ debounce: 500, maxWait: 1000 },
+			)
+
 		},
 		loadFacetComponents(){
 			frappe.call({
