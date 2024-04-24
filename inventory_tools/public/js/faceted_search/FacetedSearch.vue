@@ -32,9 +32,7 @@ export default {
 		return { searchComponents: [], filterValues: {}, sortOrder: '' }
 	},
 	mounted(){
-		frappe.ready(() => {
-			this.loadFacets()
-		})
+		this.loadFacets()
 	},
 	methods: {
 		toggleFilters(idx) {
@@ -166,11 +164,6 @@ export default {
 }
 </script>
 <style scoped>
-
-.filrer-title {
-	font-size: 1.25rem
-}
-
 .faceted-search-box {
 	min-height: 25rem;
 }
@@ -182,38 +175,39 @@ export default {
 }
 
 .pointer {
+	display: inline-block;
 	cursor: pointer;
 }
 
 /* width */
 ::-webkit-scrollbar {
-  width: 11px;
+	width: 11px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
-  border-radius: 7px;
+	box-shadow: inset 0 0 5px grey;
+	border-radius: 7px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--gray-700);
-  border-radius: 7px;
+	background: var(--gray-700);
+	border-radius: 7px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+	background: var(--primary);
 }
 
 @-moz-document url-prefix() {
 	.scrollable-filter {
-    	scrollbar-width: thin; /* Set the width of the scrollbar */
-    	scrollbar-color: var(--gray-700) #eee; /* Set the color of the scrollbar thumb and track */
+		scrollbar-width: thin; /* Set the width of the scrollbar */
+		scrollbar-color: var(--gray-700) #eee; /* Set the color of the scrollbar thumb and track */
 	}
 	.scrollable-filter:hover {
-    	scrollbar-color: var(--primary) #eee;
+		scrollbar-color: var(--primary) #eee;
 	}
  }
 </style>

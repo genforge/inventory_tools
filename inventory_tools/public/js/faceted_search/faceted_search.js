@@ -1,3 +1,5 @@
+import { createApp, reactive, ref, unref } from 'vue'
+
 import FacetedSearch from './FacetedSearch.vue'
 import AttributeFilter from './AttributeFilter.vue'
 import FacetedSearchNumericRange from './FacetedSearchNumericRange.vue'
@@ -7,18 +9,12 @@ import FacetedSearchColorPicker from './FacetedSearchColorPicker.vue'
 frappe.provide('faceted_search')
 
 faceted_search.mount = el => {
-	faceted_search.$search = new window.Vue({
-		el: el,
-		render: h => h(FacetedSearch, { props: { doctype: 'Item' } }),
-		props: { doctype: 'Item' },
-	})
-	window.Vue.component('AttributeFilter', AttributeFilter)
-	window.Vue.component('FacetedSearchNumericRange', FacetedSearchNumericRange)
-	window.Vue.component('FacetedSearchDateRange', FacetedSearchDateRange)
-	window.Vue.component('FacetedSearchColorPicker', FacetedSearchColorPicker)
-	faceted_search.$search.updateSortOrder = sortOrder => {
-		console.log('updated sort order')
-	}
+	faceted_search.$search = createApp(FacetedSearch, { props: { doctype: 'Item' } })
+	faceted_search.$search.component('AttributeFilter', AttributeFilter)
+	faceted_search.$search.component('FacetedSearchNumericRange', FacetedSearchNumericRange)
+	faceted_search.$search.component('FacetedSearchDateRange', FacetedSearchDateRange)
+	faceted_search.$search.component('FacetedSearchColorPicker', FacetedSearchColorPicker)
+	faceted_search.$search.mount(el)
 }
 
 function waitForElement(selector) {
@@ -42,7 +38,7 @@ function waitForElement(selector) {
 function mount_list_view() {
 	if (faceted_search.$search == undefined && !$('#faceted-search').length) {
 		$('.filter-section').prepend('<li id="faceted-search"></li>')
-		waitForElement('#faceted-search').then(el => {
+		waitForElement('#faceted-search').then(async el => {
 			faceted_search.mount(el)
 		})
 	}
@@ -61,21 +57,23 @@ waitForElement('[data-route]').then(element => {
 })
 
 waitForElement('#product-filters').then(element => {
-	mount_ecommerce_view(element)
-	waitForElement('.toggle-container').then(element => {
-		let el = $(element)
-		el.prepend(
-			`<select class="form-control form-input"
-				style="width: 20ch; display: inline; margin-left: 1em; float: right;"
-			>
-			<option>Title A-Z</option>
-			<option>Title Z-A</option>
-			<option>Item Code A-Z</option>
-			<option>Item Code Z-A</option>
-			</select>`
-		)
-		el.on('change', e => {
-			faceted_search.$search.$children[0].updateFilters({ sort_order: e.target.value })
+	frappe.ready(() => {
+		mount_ecommerce_view(element)
+		waitForElement('.toggle-container').then(element => {
+			let el = $(element)
+			el.prepend(
+				`<select class="form-control form-input"
+					style="width: 20ch; display: inline; margin-left: 1em; float: right;"
+				>
+				<option>Title A-Z</option>
+				<option>Title Z-A</option>
+				<option>Item Code A-Z</option>
+				<option>Item Code Z-A</option>
+				</select>`
+			)
+			el.on('change', e => {
+				faceted_search.$search.$children[0].updateFilters({ sort_order: e.target.value })
+			})
 		})
 	})
 })

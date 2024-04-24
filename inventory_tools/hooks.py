@@ -12,15 +12,22 @@ required_apps = ["erpnext", "hrms"]
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/inventory_tools/css/inventory_tools.css"
+app_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
 app_include_js = [
 	"inventory_tools.bundle.js",
 	"/assets/inventory_tools/dist/js/inventory_tools.js",
 ]
 
 # include js, css files in header of web template
-# web_include_css = "/assets/inventory_tools/css/inventory_tools.css"
-web_include_js = ["faceted_search.bundle.js"]
+web_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
+web_include_js = [
+	"faceted_search.bundle.js",
+	"/assets/inventory_tools/dist/js/inventory_tools.js",
+]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "inventory_tools/public/scss/website"
