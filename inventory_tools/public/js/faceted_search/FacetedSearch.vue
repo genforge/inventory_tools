@@ -33,7 +33,7 @@ export default {
 	},
 	mounted(){
 		frappe.ready(() => {
-			this.loadFacetComponents()
+			this.loadFacets()
 		})
 	},
 	methods: {
@@ -53,7 +53,7 @@ export default {
 			)
 
 		},
-		loadFacetComponents(){
+		loadFacets(){
 			frappe.call({
 				method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
 				args: { 'doctype': 'Item', 'filters': this.filterValues },
