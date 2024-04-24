@@ -2,8 +2,10 @@ import json
 from time import localtime
 
 import frappe
-from erpnext.e_commerce.api import *
-from frappe.utils.data import flt, getdate
+from erpnext.e_commerce.product_data_engine.filters import ProductFiltersBuilder
+from erpnext.e_commerce.product_data_engine.query import ProductQuery
+from erpnext.setup.doctype.item_group.item_group import get_child_groups_for_website
+from frappe.utils.data import cint, flt, getdate
 
 from inventory_tools.inventory_tools.doctype.specification.specification import convert_to_epoch
 
