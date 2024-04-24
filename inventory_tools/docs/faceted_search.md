@@ -1,7 +1,7 @@
 
 # Faceted Search
 
-Faceted search works on top of ERPNext's shopping cart to add additional e-commerce controls for marketplace users. This feature allows you to list your products under `/all-products` and filter them based on their specifications.
+Faceted search works on top of ERPNext's Shopping Cart to add additional Ecommerce controls for marketplace users. This feature allows you to list your products under `/all-products` and filter them based on their specifications.
 
 # Manual Setup
 
@@ -9,17 +9,12 @@ Follow the steps to create your first listed product with multiple specification
 
 ### Steps:
 
-1. Create New Item:
-   Route through `Stock` > `Item` > `Add Item` and fillup all necessary details > `Save`
-   
-3. Add Item to Website Item:
-   On Item page click `Actions` (Top Right) >  Click `Publish in Website`
-![Screen shot of ](./assets/publish_in_website.PNG)
+1. Items and Website Items should be configured according to the instructions provided for the [Ecommerce Module](https://docs.erpnext.com/docs/user/manual/en/set_up_e_commerce)
 
-5. Create Specifications for the Item:
+2. To create Specifications for the Item:
    1. Type `Specification` in Awesomebar > `Add Specification`.
    2. Select `DocType` on which you would like to customize the specification.
-   3. Select `Apply On` based on the doctype.
+   3. Select `Apply On` based on the doctype or leave it blank to apply to all records of that DocType. This currently only works for Item.
    4. Mark it `Enabled`.
 ![Screen shot of ](./assets/specification.PNG)
 
@@ -49,4 +44,4 @@ Follow the steps to create your first listed product with multiple specification
 This is how you can create and manage your specification. you can go to `/all-products`, you will see listed Item and Filter(s) on left.
 
 ### Note:
-`Specification` and `Specification Values` are reusable as long as the grouping of items is done correctly. You may want to create new specifications for different types of goods.
+`Specification` and `Specification Values` are reusable as long as the grouping of Items is done correctly. You may want to create new Specifications for different types of goods.
