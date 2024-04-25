@@ -2,6 +2,121 @@
 
 
 
+## v14.4.0 (2024-04-25)
+
+### Ci
+
+* ci: add black to ci (#61)
+
+* ci: add black to ci
+
+* chore: black ([`db5a742`](https://github.com/agritheory/inventory_tools/commit/db5a7427f068d7005f8f07125d81f1430c49eb9b))
+
+### Feature
+
+* feat: aggregate POs (#71) ([`5ff8fee`](https://github.com/agritheory/inventory_tools/commit/5ff8fee2ef356990e2dcda0d2db76d1b856a0685))
+
+### Unknown
+
+* Material Demand Test (#64)
+
+* wip: material demand tests
+
+* test: material demand aggregation tests and fixes with and without warehouse
+
+* test: material demand tests and bug fixes
+
+* chore: add mypy types isntall
+
+* fix: remove duplicate function
+
+* tests: add pytest runner file
+
+* tests: add helper files
+
+* tests: correct app name
+
+* ci: fix site_config
+
+* ci: update action version to use node 20
+
+* ci: hrms get-app
+
+* ci: add base branch sensitvie get-app
+
+* ci: add hrms to install
+
+* ci: add node 20 versions
+
+* ci: remove hrms from install-apps
+
+* ci: get-app for hrms
+
+* ci: update prettier and changed-files actions
+
+* ci: ad dhrms to apps.txt
+
+* ci: get-app for hrms again
+
+* ci: get-app for hrms only
+
+* ci: overrite erpnext install (hrms is tryign to install develop branch)
+
+* ci: add app name
+
+* ci: add repo to required apps
+
+* ci: try install hrms first with overwrite
+
+* ci: remove &#34;install_apps&#34; key from site_config
+
+* ci: remove required apps
+
+* feat: use query builder
+
+* ci: remove resolve deps
+
+* ci: fix install apps
+
+* test: fix manufacturing capacity test and report
+
+* test: cleanup uom test
+
+* test: fix error message assert
+
+* test: add ordering
+
+* fix: test
+
+* fix: use frappe function
+
+* fix: use frappe function
+
+---------
+
+Co-authored-by: fproldan &lt;franciscoproldan@gmail.com&gt; ([`6f4f63f`](https://github.com/agritheory/inventory_tools/commit/6f4f63f22f3f7278e20c6aba9e5ef6a021ae03b2))
+
+* Manufacturing capacity report (#57)
+
+* ci: update app in str(file path) code to more exact matching
+
+* chore: remove unused code
+
+* feat: add manufacturing capacity report
+
+* tests: start manufacturing capacity report tests
+
+* chore: uncomment formatting code
+
+* docs: add manufacturing capacity report documentation
+
+* fix: div by zero in parts can build calc
+
+* docs: update for calculation differences
+
+* fix: in stock qty to zero if none from query ([`2936cde`](https://github.com/agritheory/inventory_tools/commit/2936cde9aac6583edeb383d94d74142461cf243a))
+
+
 ## v14.3.0 (2024-03-01)
 
 ### Feature
