@@ -190,7 +190,7 @@ def get_data(filters):
 			r.draft_po = frappe.db.get_value(
 				"Purchase Order Item",
 				{"material_request_item": r.material_request_item, "docstatus": 0},
-				"qty",
+				"sum(qty) as qty",
 			)
 			r.draft_po = f'<span style="color: red">{r.draft_po}</span>' if r.draft_po else None
 			output.append({**r, "indent": 1})
