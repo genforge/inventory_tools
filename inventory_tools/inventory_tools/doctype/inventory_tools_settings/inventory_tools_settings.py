@@ -45,24 +45,39 @@ class InventoryToolsSettings(Document):
 			wh.save()
 
 	def validate_single_aggregation_company(self):
-		if not self.purchase_order_aggregation_company:
+		if not self.purchase_order_aggregation_company and not self.sales_order_aggregation_company:
 			return
 
 		itsl = [
 			frappe.get_doc("Inventory Tools Settings", i)
 			for i in frappe.get_all("Inventory Tools Settings")
 		]
-		for its in itsl:
-			if its.name == self.name or not its.purchase_order_aggregation_company:
-				continue
-			if self.purchase_order_aggregation_company != its.purchase_order_aggregation_company:
-				frappe.throw(
-					f"Purchase Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.purchase_order_aggregation_company}"
-				)
-			if self.aggregated_purchasing_warehouse != its.aggregated_purchasing_warehouse:
-				frappe.throw(
-					f"Purchase Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.aggregated_purchasing_warehouse}"
-				)
+
+		if self.purchase_order_aggregation_company:
+			for its in itsl:
+				if its.name == self.name or not its.purchase_order_aggregation_company:
+					continue
+				if self.purchase_order_aggregation_company != its.purchase_order_aggregation_company:
+					frappe.throw(
+						f"Purchase Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.purchase_order_aggregation_company}"
+					)
+				if self.aggregated_purchasing_warehouse != its.aggregated_purchasing_warehouse:
+					frappe.throw(
+						f"Purchase Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.aggregated_purchasing_warehouse}"
+					)
+
+		if self.sales_order_aggregation_company:
+			for its in itsl:
+				if its.name == self.name or not its.sales_order_aggregation_company:
+					continue
+				if self.sales_order_aggregation_company != its.sales_order_aggregation_company:
+					frappe.throw(
+						f"Sales Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.sales_order_aggregation_company}"
+					)
+				if self.sales_order_aggregation_company != its.sales_order_aggregation_company:
+					frappe.throw(
+						f"Sales Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.sales_order_aggregation_company}"
+					)
 
 
 @frappe.whitelist()
