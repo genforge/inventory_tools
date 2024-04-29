@@ -10,6 +10,7 @@ from erpnext.manufacturing.doctype.production_plan.production_plan import (
 from erpnext.setup.utils import enable_all_roles_and_domains, set_defaults_for_tests
 from erpnext.stock.get_item_details import get_item_details
 from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+from frappe.utils import add_months, nowdate
 from frappe.utils.data import flt, getdate
 
 from inventory_tools.tests.fixtures import (
@@ -103,6 +104,7 @@ def create_test_data():
 		create_material_request(settings)
 	create_production_plan(settings, prod_plan_from_doc)
 	create_fruit_material_request(settings)
+	create_quotations(settings)
 
 
 def create_suppliers(settings):
@@ -669,3 +671,86 @@ def create_fruit_material_request(settings):
 		)
 	mr.save()
 	mr.submit()
+
+
+def create_quotations(settings):
+	quotation = frappe.new_doc("Quotation")
+
+	items = ["Ambrosia Pie", "Gooseberry Pie", "Double Plum Pie"]
+	for item in items:
+		i = frappe.get_doc("Item", item)
+		i.append(
+			"item_defaults",
+			{
+				"company": "Chelsea Fruit Co",
+				"default_warehouse": "Finished Goods - CFC",
+			},
+		)
+		i.save()
+
+	values = {
+		"quotation_to": "Customer",
+		"order_type": "Sales",
+		"party_name": "Almacs Food Group",
+		"selling_price_list": "Bakery Wholesale",
+		"currency": "USD",
+		"conversion_rate": 1,
+		"transaction_date": nowdate(),
+		"valid_till": add_months(nowdate(), 1),
+		"items": [{"item_code": "Ambrosia Pie", "qty": 1}, {"item_code": "Gooseberry Pie", "qty": 5}],
+		"company": settings.company,
+	}
+	quotation.update(values)
+	quotation.save()
+	quotation.submit()
+
+	quotation = frappe.new_doc("Quotation")
+	values = {
+		"quotation_to": "Customer",
+		"order_type": "Sales",
+		"party_name": "Almacs Food Group",
+		"selling_price_list": "Bakery Wholesale",
+		"currency": "USD",
+		"conversion_rate": 1,
+		"transaction_date": nowdate(),
+		"valid_till": add_months(nowdate(), 1),
+		"items": [{"item_code": "Ambrosia Pie", "qty": 1}, {"item_code": "Gooseberry Pie", "qty": 5}],
+		"company": settings.company,
+	}
+	quotation.update(values)
+	quotation.save()
+	quotation.submit()
+
+	quotation = frappe.new_doc("Quotation")
+	values = {
+		"quotation_to": "Customer",
+		"order_type": "Sales",
+		"party_name": "Downtown Deli",
+		"selling_price_list": "Bakery Wholesale",
+		"currency": "USD",
+		"conversion_rate": 1,
+		"transaction_date": nowdate(),
+		"valid_till": add_months(nowdate(), 1),
+		"items": [{"item_code": "Ambrosia Pie", "qty": 2}, {"item_code": "Double Plum Pie", "qty": 1}],
+		"company": settings.company,
+	}
+	quotation.update(values)
+	quotation.save()
+	quotation.submit()
+
+	quotation = frappe.new_doc("Quotation")
+	values = {
+		"quotation_to": "Customer",
+		"order_type": "Sales",
+		"party_name": "Almacs Food Group",
+		"selling_price_list": "Bakery Wholesale",
+		"currency": "USD",
+		"conversion_rate": 1,
+		"transaction_date": nowdate(),
+		"valid_till": add_months(nowdate(), 1),
+		"items": [{"item_code": "Ambrosia Pie", "qty": 5}, {"item_code": "Double Plum Pie", "qty": 10}],
+		"company": "Chelsea Fruit Co",
+	}
+	quotation.update(values)
+	quotation.save()
+	quotation.submit()
