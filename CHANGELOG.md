@@ -2,6 +2,49 @@
 
 
 
+## v14.5.0 (2024-04-29)
+
+### Feature
+
+* feat: allow user to bulk upload items with quantity to shopping cart (#70)
+
+* feat: allow user to bulk upload items with quantity to shoping cart
+
+* nit: variable and syntactical changes
+
+* fix: removed line by line order placing, optimised code, added enqueue
+
+* fix: minor cleanup
+
+---------
+
+Co-authored-by: Rohan Bansal &lt;rohan@agritheory.dev&gt; ([`748a9bc`](https://github.com/agritheory/inventory_tools/commit/748a9bc85034094dcd60544fe2b822b67322fb44))
+
+### Unknown
+
+* Aggregate and/or Split Quotations into multiple Sales Orders  (#65)
+
+* feat: Quotation Demand
+
+* feat: hook
+
+* feat: settings for quotation demand
+
+* feat: fixes, SO validate_warehouse
+
+* feat: quotation demand tests
+
+* feat: documentation
+
+* feat: improvements
+
+* feat: improve tests
+
+* feat: total selected, price, draft so
+
+* feat: tests ([`6eceeb5`](https://github.com/agritheory/inventory_tools/commit/6eceeb5623856d659db1ffc3dd7a3ce352cd8000))
+
+
 ## v14.4.0 (2024-04-25)
 
 ### Ci
