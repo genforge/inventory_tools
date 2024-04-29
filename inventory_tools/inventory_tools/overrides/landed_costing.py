@@ -7,21 +7,18 @@ from frappe.utils import flt
 @frappe.whitelist()
 def update_valuation_rate(self, reset_outgoing_rate=True):
 	"""
-	Common code for InventoryToolsPurchaseReceipt and InventoryToolsPurchaseInvoice.
-	    This function will override the BuyingController's (mutual
-	    parent to PR and PI) class function, called in `validate()`.
+	Common code for InventoryToolsPurchaseReceipt and InventoryToolsPurchaseInvoice. This function
+	overrides the BuyingController's (mutual parent to PR and PI) class function, called in
+	`validate()`.
 
-	item_tax_amount is the total allocated tax amount applied
-	    on that item and stored for valuation. Tax amounts are
-	    only allocated when the tax.category attribute is either
-	    'Valuation' or 'Valuation and Total'
+	item_tax_amount is the total allocated tax amount applied on item and stored for valuation. Tax
+	amounts are only allocated when the tax.category attribute is either 'Valuation' or 'Valuation
+	and Total'
 
-	:param self: expects a class instance of either a Purchase
-	    Receipt or Purchase Invoice document
+	:param self: expects class instance of either a Purchase Receipt or Purchase Invoice document
 	:param reset_outgoing_rate: bool
 	:return: Nonetype
 	"""
-	print("IN OVERRIDES UPDATE_VALUATION_RATE (FOR INLINE LANDED COSTING)")
 	stock_and_asset_items = []
 	stock_and_asset_items = self.get_stock_items() + self.get_asset_items()
 
@@ -50,9 +47,7 @@ def update_valuation_rate(self, reset_outgoing_rate=True):
 			if div_by_zero_flag:
 				field = "Accepted Quantity" if based_on == "Qty" else "Amount"
 				frappe.throw(
-					_("{0} values can't total zero when distributing charges based on {1}").format(
-						field, based_on
-					)
+					_(f"{field} values can't total zero when distributing charges based on {based_on}")
 				)
 			if based_on == "Don't Distribute":
 				item.item_tax_amount = 0.0

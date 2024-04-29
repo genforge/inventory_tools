@@ -109,11 +109,10 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 
 	def on_submit_parent_with_lc_changes(self):
 		"""
-		Function is a copy/modification of ERPNext's PurchaseInvoice on_submit class function
-		        (to accommodate the Inline Landed Costing feature changes) and why super calls
-		        the current class's parent
+		Function is a copy/modification of ERPNext's PurchaseInvoice on_submit class function (to
+		accommodate the Inline Landed Costing feature changes) and why super calls the current
+		class's parent
 		"""
-		print("IN OVERRIDES ON_SUBMIT_PARENT_WITH_LC_CHANGES (FOR INLINE LANDED COSTING)")
 		super(PurchaseInvoice, self).on_submit()
 
 		self.check_prev_docstatus()
@@ -163,7 +162,11 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 		if self.update_stock == 1:
 			self.repost_future_sle_and_gle()
 
-		self.update_project()
+		if (
+			frappe.db.get_single_value("Buying Settings", "project_update_frequency") == "Each Transaction"
+		):
+			self.update_project()
+
 		update_linked_doc(self.doctype, self.name, self.inter_company_invoice_reference)
 		self.update_advance_tax_references()
 
@@ -179,11 +182,10 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 
 	def on_cancel_parent_with_lc_changes(self):
 		"""
-		Function is a copy/modification of ERPNext's PurchaseInvoice on_cancel class function
-		        (to accommodate the Inline Landed Costing feature changes) and why super calls
-		        the current class's parent
+		Function is a copy/modification of ERPNext's PurchaseInvoice on_cancel class function (to
+		accommodate the Inline Landed Costing feature changes) and why super calls the current
+		class's parent
 		"""
-		print("IN OVERRIDES ON_CANCEL_PARENT_WITH_LC_CHANGES (FOR INLINE LANDED COSTING)")
 		check_if_return_invoice_linked_with_payment_entry(self)
 
 		super(PurchaseInvoice, self).on_cancel()
@@ -224,7 +226,10 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 		if self.update_stock == 1:
 			self.repost_future_sle_and_gle()
 
-		self.update_project()
+		if (
+			frappe.db.get_single_value("Buying Settings", "project_update_frequency") == "Each Transaction"
+		):
+			self.update_project()
 		self.db_set("status", "Cancelled")
 
 		unlink_inter_company_doc(self.doctype, self.name, self.inter_company_invoice_reference)
@@ -234,6 +239,10 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 			"Repost Item Valuation",
 			"Repost Payment Ledger",
 			"Repost Payment Ledger Items",
+			"Repost Accounting Ledger",
+			"Repost Accounting Ledger Items",
+			"Unreconcile Payment",
+			"Unreconcile Payment Entries",
 			"Payment Ledger Entry",
 			"Tax Withheld Vouchers",
 		)
@@ -247,11 +256,10 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 
 	def update_landed_cost(self, prs, on_cancel=False):
 		"""
-		Function is a copy/modification of ERPNext's LandedCostVoucher update_landed_cost
-		        class function (to accommodate the Inline Landed Costing feature changes).
-		        Adds landed costs to underlying Purchase Receipts
+		Function is a copy/modification of ERPNext's LandedCostVoucher update_landed_cost class
+		function (to accommodate the Inline Landed Costing feature changes). Adds landed costs to
+		underlying Purchase Receipts.
 		"""
-		print("IN OVERRIDES PURCHASE_INVOICE.PY UPDATE_LANDED_COST (FOR INLINE LANDED COSTING)")
 		# Create a lookup dictionary by PR and item code to tax amount (field used to save LC/item): {PR_name: {item_code: item.item_tax_amount}}
 		lc_per_item_dict = {pr: {} for pr in prs}
 		for item in self.get("items"):
@@ -266,19 +274,15 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 				lcvamt = lc_per_item_dict[pr][item.item_code]
 				if not on_cancel:
 					item.landed_cost_voucher_amount = lc_per_item_dict[pr][item.item_code]
-					print(
-						f"Setting LCV to item {item.item_code} of {lcvamt} for LCV on item of {item.landed_cost_voucher_amount}"
-					)
 				else:
 					item.landed_cost_voucher_amount = 0.0
-					print(
-						f"On cancel, item {item.item_code} has LCV amount of {lcvamt} setting to zero :{item.landed_cost_voucher_amount}"
-					)
 
 			doc.update_valuation_rate(reset_outgoing_rate=False)
 
 			for item in doc.get("items"):
 				item.db_update()
+
+			# asset rate will be updated while creating asset gl entries from PI or PY
 
 			# update latest valuation rate in serial no
 			self.update_rate_in_serial_no_for_non_asset_items(doc)
@@ -305,20 +309,20 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 
 	def get_pr_lc_gl_entries(self, prs, on_cancel=False):
 		"""
-		Builds dict to hold GL-formatted entries for the landed costs to pass along to PR
-		        to properly capture tax account credit(s) against the debit to Stock on Hand
+		Builds dict to hold GL-formatted entries for the landed costs to pass along to PR to
+		properly capture tax account credit(s) against the debit to Stock on Hand
 
 		:param pr_dict: dict, holds names of purchase receipt documents covered by invoice
 		return: dict, formatted as follows:
 
 		{
-		        pr1_name: {lc_gl_format},
-		        pr2_name: {lc_gl_format}
+		    pr1_name: {lc_gl_format},
+		    pr2_name: {lc_gl_format}
 		}
 
 		Where lc_gl_format matches what's returned by PR's get_item_account_wise_additional_cost:
 		{
-		        ('item code', 'item name'): {'Account for LC charges': {'amount': 10.0, 'base_amount': 10.0}}
+		    ('item code', 'item name'): {'Account for LC charges': {'amount': 10.0, 'base_amount': 10.0}}
 		}
 		amount and base_amount per item is prorated for each account used in the taxes table
 
@@ -365,8 +369,8 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 
 	def update_rate_in_serial_no_for_non_asset_items(self, receipt_document):
 		"""
-		Function copied from LandedCostVoucher class in landed_cost_voucher.py
-		        to to accommodate inline landed costs in a Purchase Invoice
+		Function copied from LandedCostVoucher class in landed_cost_voucher.py to accommodate
+		inline landed costs in a Purchase Invoice
 		"""
 		for item in receipt_document.get("items"):
 			if not item.is_fixed_asset and item.serial_no:
