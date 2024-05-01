@@ -11,7 +11,17 @@ frappe.ui.form.on('Purchase Taxes and Charges', {
 		frappe.model.set_value(child.doctype, child.name, 'category', category)
 	},
 	taxes_remove: function (frm, cdt, cdn) {
-		frm.trigger('distribute_charges_based_on')
+		calc_landed_costs(frm)
+	},
+	category: function (frm, cdt, cdn) {
+		calc_landed_costs(frm)
+	},
+	tax_amount: function (frm, cdt, cdn) {
+		let child = locals[cdt][cdn]
+
+		// Temporarily set value so functions have updated information when called
+		child.tax_amount_after_discount_amount = child.tax_amount
+		calc_landed_costs(frm)
 	},
 })
 
@@ -24,10 +34,20 @@ frappe.ui.form.on('Purchase Invoice Item', {
 
 		// Temporarily set value so functions have updated information when called
 		child.base_net_amount = updated_base_net_amount
-		frm.trigger('distribute_charges_based_on')
+		calc_landed_costs(frm)
+	},
+	items_add: function (frm, cdt, cdn) {
+		frappe.run_serially([
+			async () => {
+				await fetch_asset_or_stock(frm)
+			},
+			() => {
+				calc_landed_costs(frm)
+			},
+		])
 	},
 	items_remove: function (frm, cdt, cdn) {
-		frm.trigger('distribute_charges_based_on')
+		calc_landed_costs(frm)
 	},
 })
 
@@ -44,9 +64,6 @@ frappe.ui.form.on('Purchase Invoice', {
 		frappe.run_serially([
 			async () => {
 				await fetch_asset_or_stock(frm)
-			},
-			() => {
-				set_tax_category(frm.doc.distribute_charges_based_on, frm.doc.taxes)
 			},
 			() => {
 				calc_landed_costs(frm)
@@ -70,6 +87,7 @@ frappe.ui.form.on('Purchase Invoice', {
 		if (!frm.doc.taxes || frm.doc.distribute_charges_based_on == "Don't Distribute") {
 			// No tax items or not distributing them, reset landed_costs and item_total fields
 			reset_landed_costs(frm)
+			set_tax_category(frm)
 		} else {
 			// Tax items exist, set each tax's category to align with dropdown selection
 			frappe.run_serially([
@@ -77,7 +95,7 @@ frappe.ui.form.on('Purchase Invoice', {
 					await fetch_asset_or_stock(frm)
 				},
 				() => {
-					set_tax_category(frm.doc.distribute_charges_based_on, frm.doc.taxes)
+					set_tax_category(frm)
 				},
 				() => {
 					calc_landed_costs(frm)
@@ -329,11 +347,11 @@ function setup_supplier_warehouse_query(frm) {
 	})
 }
 
-function set_tax_category(based_on, taxes) {
-	if (taxes.length) {
+function set_tax_category(frm) {
+	if (frm.doc.taxes.length) {
 		// Set tax category based on dropdown selection
-		taxes.forEach(tax => {
-			tax.category = based_on == "Don't Distribute" ? 'Total' : 'Valuation and Total'
+		frm.doc.taxes.forEach(tax => {
+			tax.category = frm.doc.distribute_charges_based_on == "Don't Distribute" ? 'Total' : 'Valuation and Total'
 		})
 	}
 }
@@ -368,7 +386,7 @@ function calc_landed_costs(frm) {
 		// There are stock items as well as taxes to distribute to them
 		let last_idx = stock_or_asset_items[stock_or_asset_items.length - 1].idx
 		let total_taxes = frm.doc.taxes.reduce((init_val, tax) => {
-			return init_val + tax.tax_amount_after_discount_amount
+			return init_val + (tax.category == 'Total' ? 0.0 : tax.tax_amount_after_discount_amount) // only include where category is Valuation-related
 		}, 0.0)
 		let total_qty = stock_or_asset_items.reduce((init_val, item) => {
 			return init_val + item.qty
