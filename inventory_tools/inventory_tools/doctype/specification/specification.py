@@ -19,6 +19,18 @@ class Specification(Document):
 		if self.apply_on:
 			self.title += f" - {self.apply_on}"
 
+	def before_save(self):
+		# get Specification attributes name based on parent which are in same order as newly updated attributes
+		stored_attribute_names = set(frappe.get_all("Specification Attribute", {"parent": self.name}, pluck="attribute_name", order_by="idx"))
+		new_attribute_names = set(attr.attribute_name for attr in self.attributes)
+		# get none matching attributes from each set
+		old_name = list(stored_attribute_names - new_attribute_names)
+		new_name = list(new_attribute_names - stored_attribute_names)
+
+		# for will allow us to process changes done in multiple rows
+		for index in range(0, len(old_name)):
+			frappe.enqueue(update_specification_value_attribute_name, old_name=old_name[index], new_name=new_name[index])
+
 	def create_linked_values(self, doc, extra_attributes=None):
 		for at in self.attributes:
 			if at.field:
@@ -104,6 +116,12 @@ class Specification(Document):
 				return True
 			if field.options == self.dt and doc.get(field.fieldname) == self.apply_on:
 				return True
+
+
+def update_specification_value_attribute_name(old_name, new_name):
+	specification_values = frappe.get_all("Specification Value", {"attribute": old_name}, pluck="name")
+	for specification_value in specification_values:
+		frappe.db.set_value("Specification Value", specification_value, "attribute", new_name)
 
 
 def convert_to_epoch(date):
@@ -221,9 +239,9 @@ def _create_specification_values(specification_reference, specification):
 	for value in specification.value.split(","):
 		#TODO: identify and attach reference_doctype & reference_name
 		frappe.get_doc({
-        		"doctype": "Specification Value", 
-        		"attribute": specification.attribute,
-        		"field": specification.field,
-        		"specification":specification_reference,
-        		"value": value.strip()
-        	}).save()
+				"doctype": "Specification Value", 
+				"attribute": specification.attribute,
+				"field": specification.field,
+				"specification":specification_reference,
+				"value": value.strip()
+			}).save()
