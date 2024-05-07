@@ -12,6 +12,10 @@
   "purchase_order_aggregation_company",
   "column_break_vgsiq",
   "aggregated_purchasing_warehouse",
+  "quotation_demand_section",
+  "sales_order_aggregation_company",
+  "column_break_ljy4o",
+  "aggregated_sales_warehouse",
   "work_order_subcontracting_section",
   "enable_work_order_subcontracting",
   "create_purchase_orders",
@@ -132,6 +136,29 @@
    "fieldname": "allow_switch_work_order",
    "fieldtype": "Check",
    "label": "Allow Switch Work Order"
+  },
+  {
+   "fieldname": "quotation_demand_section",
+   "fieldtype": "Section Break",
+   "label": "Quotation Demand"
+  },
+  {
+   "description": "Leave this field blank to disallow aggregation for this company",
+   "fieldname": "sales_order_aggregation_company",
+   "fieldtype": "Link",
+   "label": "Sales Order Aggregation Company",
+   "options": "Company"
+  },
+  {
+   "fieldname": "column_break_ljy4o",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "When set, this will override the Quotation Warehouse. If not set, this will map Warehouses from Quotation into Sales Order.",
+   "fieldname": "aggregated_sales_warehouse",
+   "fieldtype": "Link",
+   "label": "Aggregated Sales Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
