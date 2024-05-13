@@ -2,6 +2,7 @@ frappe.ui.form.on('Job Card', {
 	refresh: frm => {
 		if (frm.doc.operation) {
 			set_workstation_query(frm)
+			set_work_order_query(frm)
 		}
 		add_switch_work_order_action(frm)
 	},
@@ -16,6 +17,19 @@ function set_workstation_query(frm) {
 			query: 'inventory_tools.inventory_tools.overrides.workstation.get_alternative_workstations',
 			filters: {
 				operation: doc.operation,
+			},
+		}
+	})
+}
+
+function set_work_order_query(frm) {
+	if (frm.is_new()) {
+		return
+	}
+	frm.set_query('work_order', doc => {
+		return {
+			filters: {
+				production_item: doc.production_item,
 			},
 		}
 	})
