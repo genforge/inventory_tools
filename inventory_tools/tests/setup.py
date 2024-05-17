@@ -89,7 +89,7 @@ def create_test_data():
 	frappe.db.set_single_value("Stock Settings", "default_warehouse", "")
 	create_warehouses(settings)
 	setup_manufacturing_settings(settings)
-	create_workstations()
+	create_workstations(settings)
 	create_operations()
 	create_item_groups(settings)
 	create_price_lists(settings)
@@ -195,13 +195,20 @@ def setup_manufacturing_settings(settings):
 	)
 
 
-def create_workstations():
+def create_workstations(settings):
+	pf = frappe.new_doc('Plant Floor')
+	pf.floor_name = 'Kitchen'
+	pf.company = settings.company
+	pf.warehouse= 'Kitchen - APC'
+	pf.save()
+	
 	for ws in workstations:
 		if frappe.db.exists("Workstation", ws[0]):
 			continue
 		work = frappe.new_doc("Workstation")
 		work.workstation_name = ws[0]
 		work.production_capacity = ws[1]
+		work.plant_floor = pf.name
 		work.save()
 
 
