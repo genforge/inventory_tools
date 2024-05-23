@@ -130,7 +130,7 @@ async function get_specification_values(frm) {
 		{
 			reference_doctype: frm.doc.dt,
 			reference_name: frm.doc.apply_on,
-			specification: frm.doc.name
+			specification: frm.doc.name,
 		}
 	)
 	return r
