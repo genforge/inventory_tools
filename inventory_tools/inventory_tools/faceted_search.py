@@ -152,11 +152,8 @@ class FacetedSearchQuery(ProductQuery):
 
 	def query_items_with_attributes(self, attributes, start=0, sort_order=""):
 		item_codes = get_specification_items(attributes)
-
 		if item_codes:
-			item_codes = list(set.intersection(*item_codes))
 			self.filters.append(["item_code", "in", item_codes])
-
 		return self.query_items(start=start, sort_order=sort_order)
 
 
@@ -242,9 +239,9 @@ def update_specification_attribute_values(doc, method=None):
 
 
 @frappe.whitelist()
-def get_specification_items(attributes, start=0, sort_order=""):
+def get_specification_items(attributes):
 	attributes = json.loads(attributes) if isinstance(attributes, str) else attributes
-	item_codes = []
+	specification_items = set()
 
 	attributes_in_use = {k: v for (k, v) in attributes.items() if v}
 	for attribute, spec_and_values in attributes_in_use.items():
@@ -257,9 +254,9 @@ def get_specification_items(attributes, start=0, sort_order=""):
 		filters = None
 
 		date_or_numeric = frappe.get_value(
-			"Specification Attribute", spec, ["numeric_values", "date_values"]
+			"Specification Attribute", spec, ["numeric_values", "date_values"], as_dict=True
 		)
-		if date_or_numeric[0] == 1:
+		if date_or_numeric.numeric_values == 1:
 			values[0], values[-1] = (
 				flt(values[0]) if values[0] else None,
 				flt(values[-1]) if values[-1] else None,
@@ -278,7 +275,7 @@ def get_specification_items(attributes, start=0, sort_order=""):
 					["value", "<=", flt(values[-1])],
 				)
 
-		elif date_or_numeric[1] == 1:
+		elif date_or_numeric.date_values == 1:
 			filters = [
 				["attribute", "=", attribute],
 				[
@@ -299,12 +296,11 @@ def get_specification_items(attributes, start=0, sort_order=""):
 				"attribute": attribute,
 				"value": ["in", values],
 			}
-		item_code_list = frappe.get_all(
+		item_codes = frappe.get_all(
 			"Specification Value",
-			fields=["reference_name"],
-			filters=filters,  # debug=True
+			filters=filters,
+			pluck="reference_name",
 		)
-		item_codes.append({x.reference_name for x in item_code_list})
+		specification_items.update(item_codes)
 
-	if item_codes:
-		return list(item_codes)
+	return list(specification_items)

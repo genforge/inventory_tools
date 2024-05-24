@@ -1,4 +1,4 @@
-import { createApp, reactive, ref, unref } from 'vue'
+import { createApp } from 'vue'
 
 import FacetedSearch from './FacetedSearch.vue'
 import AttributeFilter from './AttributeFilter.vue'
@@ -36,7 +36,7 @@ function waitForElement(selector) {
 }
 
 function mount_list_view() {
-	if (faceted_search.$search == undefined && !$('#faceted-search').length) {
+	if (!faceted_search.$search && $('#faceted-search').length === 0 && $('.filter-section').length > 0) {
 		$('.filter-section').prepend('<li id="faceted-search"></li>')
 		waitForElement('#faceted-search').then(async el => {
 			faceted_search.mount(el)

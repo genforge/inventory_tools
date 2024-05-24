@@ -2,7 +2,7 @@
 	<div>
 		<div v-for="(attr, idx) in selectedValues" :key="idx">
 			<input type="checkbox" v-model="attr.isChecked" @change="change" />
-			<span> {{ attr.attribute }}</span>
+			<span>{{ attr.attribute }}</span>
 		</div>
 	</div>
 </template>
@@ -20,12 +20,8 @@ export default {
 				attribute_name: this.attribute_name,
 				attribute_id: this.attribute_id,
 				values: this.selectedValues
-					.map(r => {
-						return r.isChecked ? r.attribute : null
-					})
-					.filter(r => {
-						return r != null
-					}),
+					.map(r => r.isChecked ? r.attribute : null)
+					.filter(r => r != null),
 			})
 		},
 	},
