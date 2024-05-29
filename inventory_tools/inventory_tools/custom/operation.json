@@ -44,7 +44,7 @@
    "name": "Operation-alternative_workstations",
    "no_copy": 0,
    "non_negative": 0,
-   "options": "Alternative Workstations",
+   "options": "Alternative Workstation",
    "owner": "Administrator",
    "permlevel": 0,
    "precision": "",

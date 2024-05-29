@@ -154,6 +154,7 @@ class InventoryToolsStockEntry(StockEntry):
 
 
 @frappe.whitelist()
+@frappe.read_only()
 def get_production_item_if_work_orders_for_required_item_exists(stock_entry_name: str) -> str:
 	stock_entry = frappe.get_doc("Stock Entry", stock_entry_name)
 

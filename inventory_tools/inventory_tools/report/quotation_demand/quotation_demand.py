@@ -162,7 +162,6 @@ def create(company, filters, rows):
 	rows = [frappe._dict(r) for r in json.loads(rows)] if isinstance(rows, str) else rows
 	if not rows:
 		return
-	print(rows)
 	counter = 0
 	settings = frappe.get_doc("Inventory Tools Settings", company)
 	requesting_companies = list({row.company for row in rows})
