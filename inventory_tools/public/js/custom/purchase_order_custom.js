@@ -173,9 +173,7 @@ async function create_sis(frm) {
 }
 
 async function create_dialog(frm, title, label, method, primary_action_label) {
-	let items_data = frm.doc.items.filter(r => {
-		return r.company != frm.doc.company && r.rate != 0.0 && r.stock_qty > 0.0
-	})
+	let items_data = await get_items_data(frm)
 	return new Promise(resolve => {
 		let table_fields = {
 			fieldname: 'locations',
@@ -220,8 +218,8 @@ async function create_dialog(frm, title, label, method, primary_action_label) {
 				},
 			],
 			data: items_data,
-			get_data: () => {
-				return items_data
+			get_data: async () => {
+				return await get_items_data(frm)
 			},
 		}
 		let dialog = new frappe.ui.Dialog({
@@ -240,4 +238,44 @@ async function create_dialog(frm, title, label, method, primary_action_label) {
 		dialog.wrapper.find('.grid-buttons').hide()
 		// dialog.get_close_btn()
 	})
+}
+
+async function get_items_data(frm) {
+	let items_data = []
+	if (
+		frm.doc.docstatus &&
+		frappe.boot.inventory_tools &&
+		frappe.boot.inventory_tools[frm.doc.company] &&
+		frappe.boot.inventory_tools[frm.doc.company].aggregated_purchasing_warehouse
+	) {
+		items_data = frm.doc.items
+		items_data.forEach(row => {
+			row.company = frm.doc.company
+		})
+		return items_data
+	} else {
+		let items_data = frm.doc.items.filter(r => {
+			return r.company != frm.doc.company && r.rate != 0.0 && r.stock_qty > 0.0
+		})
+		let mrs = Array.from(
+			new Set(
+				frm.doc.items.map(r => {
+					return r.material_request
+				})
+			)
+		)
+		await frappe.db
+			.get_list('Material Request', { filters: { name: ['in', mrs] }, fields: ['name', 'company'] })
+			.then(r => {
+				console.log(r)
+				r.forEach(mr => {
+					items_data.forEach(row => {
+						if (row.material_request == mr.name) {
+							row.company = mr.company
+						}
+					})
+				})
+			})
+		return items_data
+	}
 }

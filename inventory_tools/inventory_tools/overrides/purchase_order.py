@@ -106,22 +106,22 @@ def make_purchase_invoices(docname: str, rows: Union[list, str]) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	forwarding = frappe._dict()
-	for row in doc.items:
-		if row.name in rows:
-			if row.company in forwarding:
-				forwarding[row.company].append(row.name)
-			else:
-				forwarding[row.company] = [row.name]
+	for _row in rows:
+		company = frappe.get_value("Material Request", _row.material_request, "company")
+		if company in forwarding:
+			forwarding[company].append(_row)
+		else:
+			forwarding[company] = [_row]
 
 	for company, rows in forwarding.items():
 		pi = make_purchase_invoice(docname)
 		pi.company = company
 		pi.credit_to = frappe.get_value("Company", pi.company, "default_payable_account")
-		for row in pi.items:
-			if row.po_detail in rows:
+		for _row in pi.items:
+			if _row.po_detail in rows:
 				continue
 			else:
-				pi.items.remove(row)
+				pi.items.remove(_row)
 		pi.save()
 
 
@@ -129,22 +129,32 @@ def make_purchase_invoices(docname: str, rows: Union[list, str]) -> None:
 def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
-	forwarding = frappe._dict()
-	for row in doc.items:
-		if row.name in rows:
-			if row.company in forwarding:
-				forwarding[row.company].append(row.name)
-			else:
-				forwarding[row.company] = [row.name]
+	inventory_tools_settings = frappe.get_doc("Inventory Tools Settings", doc.company)
 
-	for company, rows in forwarding.items():
+	forwarding = frappe._dict()
+	for row_name in rows:
+		for row in doc.items:
+			if row_name == row.name:
+				company = frappe.get_value("Material Request", row.material_request, "company")
+				if company in forwarding:
+					forwarding[company].append(row.name)
+				else:
+					forwarding[company] = [row.name]
+
+	for company, _rows in forwarding.items():
 		pr = make_purchase_receipt(docname)
 		pr.company = company
+		filtered_rows = []
 		for row in pr.items:
-			if row.purchase_order_item in rows:
-				continue
-			else:
-				pr.items.remove(row)
+			if row.purchase_order_item in _rows:
+				if inventory_tools_settings.aggregated_purchasing_warehouse is not None:
+					row.warehouse = inventory_tools_settings.aggregated_purchasing_warehouse
+				else:
+					row.warehouse = frappe.get_value(
+						"Material Request Item", row.material_request_item, "warehouse"
+					)
+				filtered_rows.append(row)
+		pr.items = filtered_rows
 		pr.save()
 
 
