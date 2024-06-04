@@ -55,15 +55,22 @@ class InventoryToolsPurchaseOrder(PurchaseOrder):
 		super(PurchaseOrder, self).validate_with_previous_doc(config)
 
 	def validate_warehouse(self):
-		warehouses = list({d.warehouse for d in self.get("items") if getattr(d, "warehouse", None)})
+		warehouses = []
+		inventory_tools_settings = frappe.get_doc("Inventory Tools Settings", self.company)
 
-		warehouses.extend(
-			list({d.target_warehouse for d in self.get("items") if getattr(d, "target_warehouse", None)})
-		)
-
-		warehouses.extend(
-			list({d.from_warehouse for d in self.get("items") if getattr(d, "from_warehouse", None)})
-		)
+		for d in self.get("items"):
+			if (
+				self.multi_company_purchase_order
+				and not inventory_tools_settings.aggregated_purchasing_warehouse
+			):
+				validate_warehouse_company(d.warehouse, d.material_request_company)
+				continue
+			if getattr(d, "warehouse", None):
+				warehouses.append(d.warehouse)
+			if getattr(d, "target_warehouse", None):
+				warehouses.append(d.warehouse)
+			if getattr(d, "from_warehouse", None):
+				warehouses.append(d.warehouse)
 
 		for w in warehouses:
 			validate_disabled_warehouse(w)
@@ -105,23 +112,37 @@ class InventoryToolsPurchaseOrder(PurchaseOrder):
 def make_purchase_invoices(docname: str, rows: Union[list, str]) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
+	inventory_tools_settings = frappe.get_doc("Inventory Tools Settings", doc.company)
 	forwarding = frappe._dict()
-	for _row in rows:
-		company = frappe.get_value("Material Request", _row.material_request, "company")
-		if company in forwarding:
-			forwarding[company].append(_row)
-		else:
-			forwarding[company] = [_row]
+	for row_name in rows:
+		for row in doc.items:
+			if row_name == row.name:
+				company = frappe.get_value("Material Request", row.material_request, "company")
+				if company in forwarding:
+					forwarding[company].append(row.name)
+				else:
+					forwarding[company] = [row.name]
 
-	for company, rows in forwarding.items():
+	for company, _rows in forwarding.items():
 		pi = make_purchase_invoice(docname)
 		pi.company = company
 		pi.credit_to = frappe.get_value("Company", pi.company, "default_payable_account")
-		for _row in pi.items:
-			if _row.po_detail in rows:
-				continue
-			else:
-				pi.items.remove(_row)
+		filtered_rows = []
+		for row in pi.items:
+			if row.po_detail in _rows:
+				if inventory_tools_settings.aggregated_purchasing_warehouse is not None:
+					row.warehouse = inventory_tools_settings.aggregated_purchasing_warehouse
+				else:
+					material_request_item = frappe.get_value(
+						"Purchase Order Item", row.po_detail, "material_request_item"
+					)
+					warehouse, cost_center = frappe.get_value(
+						"Material Request Item", material_request_item, ["warehouse", "cost_center"]
+					)
+					row.warehouse = warehouse
+					row.cost_center = cost_center
+				filtered_rows.append(row)
+		pi.items = filtered_rows
 		pi.save()
 
 
@@ -130,6 +151,7 @@ def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	inventory_tools_settings = frappe.get_doc("Inventory Tools Settings", doc.company)
+	prs = []
 
 	forwarding = frappe._dict()
 	for row_name in rows:
@@ -150,9 +172,11 @@ def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
 				if inventory_tools_settings.aggregated_purchasing_warehouse is not None:
 					row.warehouse = inventory_tools_settings.aggregated_purchasing_warehouse
 				else:
-					row.warehouse = frappe.get_value(
-						"Material Request Item", row.material_request_item, "warehouse"
+					warehouse, cost_center = frappe.get_value(
+						"Material Request Item", row.material_request_item, ["warehouse", "cost_center"]
 					)
+					row.warehouse = warehouse
+					row.cost_center = cost_center
 				filtered_rows.append(row)
 		pr.items = filtered_rows
 		pr.save()
