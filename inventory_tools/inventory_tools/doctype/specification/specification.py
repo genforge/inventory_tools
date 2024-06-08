@@ -6,8 +6,10 @@ import json
 import time
 
 import frappe
+from erpnext.controllers.queries import get_fields
 from frappe.core.doctype.doctype.doctype import no_value_fields, table_fields
 from frappe.model.document import Document
+from frappe.query_builder import DocType
 from frappe.utils.data import flt, get_datetime
 from pytz import UnknownTimeZoneError, timezone
 
@@ -199,6 +201,20 @@ def get_specification_values(reference_doctype, reference_name, specification=No
 						value_string += str(value) + ", "
 				value_string = value_string.strip(", ")
 			rows.append({"attribute": attribute.attribute, "field": attribute.field, "value": value_string})
+
+		# no results, probably setting up a new item
+		if not rows:
+			specification = frappe.get_doc("Specification", specification)
+			rows = [
+				{
+					"attribute": attribute.attribute_name,
+					"field": attribute.field,
+					"value": frappe.get_value(reference_doctype, reference_name, attribute.field)
+					if attribute.field
+					else None,
+				}
+				for attribute in specification.attributes
+			]
 		return rows
 
 	# to get existing specification value for each Item
@@ -256,7 +272,6 @@ def update_specification_values(reference_doctype, reference_name, spec, specifi
 			av.attribute = s.attribute
 			av.specification = spec
 			av.value = s.value
-			# TODO:
 			date_values = frappe.get_value(
 				"Specification Attribute", {"parent": spec, "attribute_name": s.attribute}, ["date_values"]
 			)
@@ -279,3 +294,44 @@ def _create_specification_values(specification_reference, specification):
 				"value": value.strip(),
 			}
 		).save()
+
+
+# readonly
+@frappe.whitelist()
+def get_apply_on_fields(doctype):
+	Spec = DocType("Specification")
+	SpecAttr = DocType("Specification Attribute")
+	query = (
+		frappe.qb.from_(Spec)
+		.select(Spec.dt, Spec.apply_on)
+		.inner_join(SpecAttr)
+		.on(Spec.name == SpecAttr.parent)
+		.where(Spec.enabled == 1)
+	)
+	if doctype != "Specification":
+		query = query.where(SpecAttr.applied_on == doctype)
+	return query.distinct().run(as_dict=True)
+
+
+@frappe.whitelist()
+# @frappe.readonly()
+@frappe.validate_and_sanitize_search_inputs
+def specification_query(doctype, txt, searchfield, start, page_len, filters):
+	print(doctype, txt, searchfield, start, page_len, filters)
+	meta = frappe.get_meta("Specification")
+	fieldnames = [f.fieldname for f in meta.fields]
+	for f in reversed(filters):
+		if f[0] in fieldnames:
+			continue
+		del f
+
+	search_fields = get_fields("Specification")
+	specifications = frappe.get_all(
+		"Specification",
+		fields=search_fields,
+		filters=filters,
+		limit_start=start,
+		limit_page_length=page_len,
+		as_list=1,
+	)
+	return specifications
