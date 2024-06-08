@@ -37,6 +37,8 @@ class Specification(Document):
 			)
 
 	def create_linked_values(self, doc, extra_attributes=None):
+		if not self.name:
+			return
 		for at in self.attributes:
 			if at.field:
 				existing_attribute_value = frappe.db.get_value(
@@ -55,11 +57,12 @@ class Specification(Document):
 					av = frappe.new_doc("Specification Value")
 					av.reference_doctype = at.applied_on
 					av.reference_name = doc.name
-					av.specification = self.name
 					av.attribute = at.attribute_name
 					av.field = at.field
+					av.value = frappe.get_value(av.reference_doctype, av.reference_name, at.field)
 				if at.date_values:
 					av.value = convert_to_epoch(av.value)
+				av.specification = self.name
 				av.save()
 			if extra_attributes and at.attribute_name in extra_attributes:
 				if isinstance(extra_attributes[at.attribute_name], (str, int, float)):
@@ -81,6 +84,7 @@ class Specification(Document):
 					av.value = extra_attributes[at.attribute_name]
 					if at.date_values:
 						av.value = convert_to_epoch(av.value)
+					av.specification = self.name
 					av.save()
 					continue
 
@@ -88,6 +92,8 @@ class Specification(Document):
 					continue
 
 				for value in extra_attributes[at.attribute_name]:  # list, tuple or set / not dict
+					if value is not None:
+						continue
 					existing_attribute_value = frappe.db.get_value(
 						"Specification Value",
 						{
@@ -107,6 +113,7 @@ class Specification(Document):
 					av.value = value
 					if at.date_values:
 						av.value = convert_to_epoch(av.value)
+					av.specification = self.name
 					av.save()
 
 	@property

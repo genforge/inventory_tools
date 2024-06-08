@@ -46,7 +46,8 @@ function add_specification_dialog(frm) {
 }
 
 async function specification_dialog(frm) {
-	const data = await get_specification_values(frm)
+	let data = []
+	data = await get_specification_values(frm)
 	let attributes = data.map(r => r.attribute)
 	let fields = [
 		{
@@ -57,6 +58,9 @@ async function specification_dialog(frm) {
 			disabled: 0,
 			label: __('Attribute'),
 			options: attributes,
+			onchange: a => {
+				validate_duplicate_attributes()
+			},
 		},
 		{
 			fieldtype: 'Data',
@@ -99,7 +103,6 @@ async function specification_dialog(frm) {
 					editable_grid: true,
 					reqd: 1,
 					data: data,
-					get_data: () => get_specification_values(frm),
 					fields: fields,
 				},
 			],
@@ -108,6 +111,7 @@ async function specification_dialog(frm) {
 				if (!values) {
 					return
 				}
+				validate_duplicate_attributes(values)
 				frappe.xcall(
 					'inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values',
 					{
@@ -134,4 +138,21 @@ async function get_specification_values(frm) {
 		}
 	)
 	return r
+}
+
+function validate_duplicate_attributes(values = null) {
+	if (!values) {
+		values = cur_dialog.get_values()
+	}
+	const attributes = values.specs.map(i => {
+		if (i.attribute && i.field) {
+			return i.attribute
+		}
+	})
+	let is_duplicate = attributes.some((item, idx) => {
+		return attributes.indexOf(item) != idx
+	})
+	if (is_duplicate) {
+		frappe.throw(__('Field level duplicates are not permitted in a Specification'))
+	}
 }
