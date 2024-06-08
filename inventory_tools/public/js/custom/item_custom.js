@@ -18,7 +18,15 @@ function add_specification_dialog(frm) {
 async function specification_dialog(frm) {
 	const data = await get_specifications(frm)
 	let current_spec = data[0].specification
-	let attributes = data.map(r => r.attribute)
+	let attributes = Array.from(
+		new Set(
+			data.map(i => {
+				if (i.attribute && !i.field) {
+					return i.attribute
+				}
+			})
+		)
+	)
 	let fields = [
 		{
 			fieldtype: 'Data',
