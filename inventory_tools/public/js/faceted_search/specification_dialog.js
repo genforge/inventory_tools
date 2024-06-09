@@ -111,13 +111,16 @@ inventory_tools.specification_dialog = async frm => {
 					return
 				}
 				validate_duplicate_attributes(values)
-				frappe.xcall(
-					'inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values',
-					{
-						specification_reference: frm.doc.name,
-						specifications: values.specs,
-					}
-				)
+				let method = 'inventory_tools.inventory_tools.doctype.specification.specification.update_specification_values'
+				if (frm.doc.doctype == 'Specification') {
+					method = 'inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values'
+				}
+				frappe.xcall(method, {
+					spec: frm.doc.doctype == 'Specification' ? frm.doc.name : values.specification,
+					specifications: values.specs,
+					reference_doctype: frm.doc.doctype == 'Specification' ? '' : frm.doc.doctype,
+					reference_name: frm.doc.doctype == 'Specification' ? '' : frm.doc.name,
+				})
 				resolve(d.hide())
 			},
 			primary_action_label: frm.doc.doctype == 'Specification' ? __('Generate') : __('Save'),

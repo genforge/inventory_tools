@@ -797,7 +797,6 @@ def create_specifications(settings=None):
 			s = frappe.new_doc("Specification")
 			s.name = spec.get("name")
 			s.dt = spec.get("dt")
-			s.name = "Item Group - Baked Goods"
 			s.apply_on = spec.get("apply_on")
 			s.enabled = spec.get("enabled")
 			for at in spec.get("attributes"):

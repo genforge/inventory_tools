@@ -46,15 +46,16 @@ class Specification(Document):
 				existing_attribute_value = frappe.db.get_value(
 					"Specification Value",
 					{
-						"reference_doctype": at.applied_on,
+						"reference_doctype": doc.doctype,
 						"reference_name": doc.name,
 						"attribute": at.attribute_name,
+						"field": at.field,
 						"specification": self.name,
 					},
 				)
 				if existing_attribute_value:
 					av = frappe.get_doc("Specification Value", existing_attribute_value)
-					av.value = frappe.get_value(av.reference_doctype, av.reference_name, at.field)
+					av.value = doc.get(at.field)
 				else:
 					av = frappe.new_doc("Specification Value")
 					av.reference_doctype = at.applied_on
@@ -66,6 +67,8 @@ class Specification(Document):
 					av.value = convert_to_epoch(av.value)
 				av.specification = self.name
 				av.save()
+				continue
+
 			if extra_attributes and at.attribute_name in extra_attributes:
 				if isinstance(extra_attributes[at.attribute_name], (str, int, float)):
 					existing_attribute_value = frappe.db.get_value(
@@ -236,24 +239,9 @@ def get_specification_values(reference_doctype, reference_name, specification=No
 
 
 @frappe.whitelist()
-def create_specification_values(specification_reference, specifications):
+def update_specification_values(spec, specifications, reference_doctype, reference_name):
 	if isinstance(specifications, str):
-		specifications = json.loads(specifications)
-		specifications = [frappe._dict(**s) for s in specifications]
-	for specification in specifications:
-		frappe.enqueue(
-			_create_specification_values,
-			queue="short",
-			specification_reference=specification_reference,
-			specification=specification,
-		)
-
-
-@frappe.whitelist()
-def update_specification_values(reference_doctype, reference_name, spec, specifications):
-	if isinstance(specifications, str):
-		specifications = json.loads(specifications)
-		specifications = [frappe._dict(**s) for s in specifications]
+		specifications = [frappe._dict(**s) for s in json.loads(specifications)]
 	# convert dates to epoch
 	existing_values = get_specification_values(reference_doctype, reference_name)
 	for s in specifications:
@@ -280,20 +268,60 @@ def update_specification_values(reference_doctype, reference_name, spec, specifi
 			av.save()
 
 
-def _create_specification_values(specification_reference, specification):
-	if not specification.value:
-		return
-	for value in specification.value.split(","):
-		# TODO: identify and attach reference_doctype & reference_name
-		frappe.get_doc(
+@frappe.whitelist()
+def create_specification_values(
+	spec, specifications=None, reference_doctype=None, reference_name=None
+):
+	if isinstance(specifications, str):
+		specifications = [frappe._dict(**s) for s in json.loads(specifications)]
+	specification = frappe.get_doc("Specification", spec)
+	specification_values = frappe._dict(
+		{
+			s.get("attribute"): s.get("value")
+			for s in specifications
+			if not s.get("field") and s.get("value")
+		}
+	)
+	for row in specification.attributes:
+		if not row.field and not specification_values.get(row.attribute_name):
+			continue
+		value = specification_values.get(row.attribute_name) or None
+		if frappe.flags.in_test:
+			_create_specification_values(specification, row, value)
+		else:
+			frappe.enqueue(
+				_create_specification_values,
+				specification=specification,
+				attribute=row,
+				value=value,
+				queue="short",
+			)
+
+
+def _create_specification_values(specification, attribute, value):
+	apply_on_filters = []
+	if specification.apply_on:
+		apply_on_filters.append([frappe.scrub(specification.dt), "=", specification.apply_on])
+	applicable_documents = frappe.get_all(attribute.applied_on, filters=apply_on_filters)
+	for doc in applicable_documents:
+		if not value:
+			value = frappe.get_value(attribute.applied_on, doc.name, attribute.field)
+		if not value:
+			continue
+		values = frappe._dict(
 			{
-				"doctype": "Specification Value",
-				"attribute": specification.attribute,
-				"field": specification.field,
-				"specification": specification_reference,
-				"value": value.strip(),
+				"attribute": attribute.attribute_name,
+				"field": attribute.field,
+				"specification": specification.name,
+				"reference_doctype": attribute.applied_on,
+				"reference_name": doc.name,
+				"value": value,
 			}
-		).save()
+		)
+		if not frappe.get_all("Specification Value", filters=values):
+			s = frappe.new_doc("Specification Value")
+			s.update(values)
+			s.save()
 
 
 # readonly
@@ -317,7 +345,6 @@ def get_apply_on_fields(doctype):
 # @frappe.readonly()
 @frappe.validate_and_sanitize_search_inputs
 def specification_query(doctype, txt, searchfield, start, page_len, filters):
-	print(doctype, txt, searchfield, start, page_len, filters)
 	meta = frappe.get_meta("Specification")
 	fieldnames = [f.fieldname for f in meta.fields]
 	for f in reversed(filters):
