@@ -12,6 +12,12 @@ from frappe.utils.data import cint
 
 class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 	def validate_with_previous_doc(self):
+		"""
+		HASH: 014486de39dd7da6fe79bf803adcf1b66d890876
+		REPO: https://github.com/frappe/erpnext/
+		PATH: erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py
+		METHOD: validate_with_previous_doc
+		"""
 		config = {
 			"Purchase Order": {
 				"ref_dn_field": "purchase_order",
