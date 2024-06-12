@@ -157,7 +157,6 @@ def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	inventory_tools_settings = frappe.get_doc("Inventory Tools Settings", doc.company)
-	prs = []
 
 	forwarding = frappe._dict()
 	for row_name in rows:
