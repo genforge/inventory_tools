@@ -44,7 +44,7 @@ jobs:
           node-version: 20
           check-latest: true
           cache: 'yarn'  # Replaces `Get yarn cache directory path` and `yarn-cache` steps
-    
+
       # Uncomment if running locally, remove after local testing (already available in github actions environment)
       # - name: Install Yarn
       #   run: npm install -g yarn
@@ -90,4 +90,11 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           source env/bin/activate
-          pytest ./apps/inventory_tools/inventory_tools/tests/ --disable-warnings -s
+          cd apps/inventory_tools
+          pytest --cov=inventory_tools --cov-report=xml --disable-warnings -s | tee pytest-coverage.txt
+
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: /home/runner/frappe-bench/apps/inventory_tools/pytest-coverage.txt
+          junitxml-path: /home/runner/frappe-bench/apps/inventory_tools/coverage.xml
