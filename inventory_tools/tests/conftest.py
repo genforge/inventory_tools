@@ -1,6 +1,6 @@
+import json
 from pathlib import Path
 from unittest.mock import MagicMock
-import json
 
 import frappe
 import pytest
@@ -40,4 +40,3 @@ def db_instance():
 	frappe.connect()
 	frappe.db.commit = MagicMock()
 	yield frappe.db
-
