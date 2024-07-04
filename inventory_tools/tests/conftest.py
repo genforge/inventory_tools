@@ -40,4 +40,3 @@ def db_instance():
 	frappe.connect()
 	frappe.db.commit = MagicMock()
 	yield frappe.db
-
