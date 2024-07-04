@@ -5,8 +5,8 @@
 		:style="{
 			'background-image': `url(${frm.doc.plant_floor_layout})`,
 			'width': '100%',
-			'height': plant_floor_layout_height,
-			'min-height': plant_floor_layout_height,
+			// 'height': plant_floor_layout_height,
+			// 'min-height': plant_floor_layout_height,
 			'background-position': 'center',
 			'background-repeat': 'no-repeat',
 			'background-size': 'contain',
