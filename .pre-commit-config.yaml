@@ -46,11 +46,6 @@ repos:
               beam/public/js/lib/.*
           )$
 
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.12.0
-    hooks:
-      - id: isort
-
   - repo: https://github.com/PyCQA/flake8
     rev: 5.0.4
     hooks:

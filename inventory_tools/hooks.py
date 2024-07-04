@@ -12,8 +12,13 @@ required_apps = ["erpnext", "hrms"]
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/inventory_tools/css/inventory_tools.css"
-app_include_js = ["inventory_tools.bundle.js"]
+app_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
+app_include_js = [
+	"inventory_tools.bundle.js",
+	"/assets/inventory_tools/dist/js/inventory_tools.js",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/inventory_tools/css/inventory_tools.css"
@@ -37,6 +42,7 @@ doctype_js = {
 	"Stock Entry": "public/js/stock_entry_custom.js",
 	"Job Card": "public/js/job_card_custom.js",
 	"Operation": "public/js/operation_custom.js",
+	"Plant Floor": "public/js/plant_floor_custom.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
