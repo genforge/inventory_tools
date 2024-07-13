@@ -1,6 +1,3 @@
-# Copyright (c) 2024, AgriTheory and contributors
-# For license information, please see license.txt
-
 import frappe
 from erpnext.stock.doctype.stock_entry.stock_entry import FinishedGoodError, StockEntry
 from frappe import _
@@ -12,18 +9,12 @@ from inventory_tools.inventory_tools.overrides.work_order import get_allowance_p
 class InventoryToolsStockEntry(StockEntry):
 	def check_if_operations_completed(self):
 		"""
-		HASH: ce8b423ad6aefd2a0355a8efd3505c2d9e161cee
-		REPO: https://github.com/frappe/erpnext/
-		PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
-		METHOD: check_if_operations_completed
-
 		Original code checks that the stock entry amount plus what's already produced in the WO
 		is not larger than any operation's completed quantity (plus the overallowance amount).
 		Since customized code rewires so stock entries happen via a Job Card, the function now
 		checks that the stock entry amount plus what's already been produced in the WO is not
 		greater than the amount to be manufactured plus the overallowance amount.
 		"""
-
 		prod_order = frappe.get_doc("Work Order", self.work_order)
 		allowance_percentage = get_allowance_percentage(self.company, self.bom_no)
 
@@ -54,16 +45,10 @@ class InventoryToolsStockEntry(StockEntry):
 
 	def validate_finished_goods(self):
 		"""
-		HASH: ce8b423ad6aefd2a0355a8efd3505c2d9e161cee
-		REPO: https://github.com/frappe/erpnext/
-		PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
-		METHOD: validate_finished_goods
-
 		1. Check if FG exists (mfg, repack)
 		2. Check if Multiple FG Items are present (mfg)
 		3. Check FG Item and Qty against WO if present (mfg)
 		"""
-
 		production_item, wo_qty, finished_items = None, 0, []
 
 		wo_details = frappe.db.get_value("Work Order", self.work_order, ["production_item", "qty"])
@@ -94,7 +79,7 @@ class InventoryToolsStockEntry(StockEntry):
 
 		if not finished_items:
 			frappe.throw(
-				msg=_("There must be at least 1 Finished Good in this Stock Entry").format(self.name),
+				msg=_("There must be atleast 1 Finished Good in this Stock Entry").format(self.name),
 				title=_("Missing Finished Good"),
 				exc=FinishedGoodError,
 			)
@@ -120,15 +105,9 @@ class InventoryToolsStockEntry(StockEntry):
 
 	def get_pending_raw_materials(self, backflush_based_on=None):
 		"""
-		HASH: ce8b423ad6aefd2a0355a8efd3505c2d9e161cee
-		REPO: https://github.com/frappe/erpnext/
-		PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
-		METHOD: get_pending_raw_materials
-
 		issue (item quantity) that is pending to issue or desire to transfer,
 		whichever is less
 		"""
-
 		item_dict = self.get_pro_order_required_items(backflush_based_on)
 
 		max_qty = flt(self.pro_doc.qty)
