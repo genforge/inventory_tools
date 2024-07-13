@@ -10,13 +10,6 @@ from frappe.utils.data import cint
 
 class InventoryToolsPurchaseReceipt(PurchaseReceipt):
 	def validate_with_previous_doc(self):
-		"""
-		HASH: ce8b423ad6aefd2a0355a8efd3505c2d9e161cee
-		REPO: https://github.com/frappe/erpnext/
-		PATH: erpnext/stock/doctype/purchase_receipt/purchase_receipt.py
-		METHOD: validate_with_previous_doc
-		"""
-
 		config = {
 			"Purchase Order": {
 				"ref_dn_field": "purchase_order",
@@ -29,7 +22,6 @@ class InventoryToolsPurchaseReceipt(PurchaseReceipt):
 				"allow_duplicate_prev_row_id": True,
 			},
 		}
-
 		pos = list({r.purchase_order for r in self.items})
 		if len(pos) == 1 and frappe.get_value("Purchase Order", pos[0], "multi_company_purchase_order"):
 			config["Purchase Order"]["compare_fields"] = [["supplier", "="], ["currency", "="]]
