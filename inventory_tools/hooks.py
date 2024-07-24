@@ -34,14 +34,14 @@ app_include_js = ["inventory_tools.bundle.js"]
 
 # include js in doctype views
 doctype_js = {
-	"Job Card": "public/js/job_card_custom.js",
-	"Purchase Invoice": "public/js/purchase_invoice_custom.js",
-	"Purchase Order": "public/js/purchase_order_custom.js",
-	"Operation": "public/js/operation_custom.js",
-	"Purchase Invoice": "public/js/purchase_invoice_custom.js",
-	"Purchase Order": "public/js/purchase_order_custom.js",
-	"Stock Entry": "public/js/stock_entry_custom.js",
-	"Work Order": "public/js/work_order_custom.js",
+	"Item": "public/js/custom/item_custom.js",
+	"Job Card": "public/js/custom/job_card_custom.js",
+	"Operation": "public/js/custom/operation_custom.js",
+	"Purchase Invoice": "public/js/custom/purchase_invoice_custom.js",
+	"Purchase Order": "public/js/custom/purchase_order_custom.js",
+	"Stock Entry": "public/js/custom/stock_entry_custom.js",
+	"Work Order": "public/js/custom/work_order_custom.js",
+	"Workstation": "public/js/custom/workstation_custom.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -122,6 +122,7 @@ override_doctype_class = {
 	"Sales Order": "inventory_tools.inventory_tools.overrides.sales_order.InventoryToolsSalesOrder",
 	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
 	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
+	"Workstation": "inventory_tools.inventory_tools.overrides.workstation.InventoryToolsWorkstation",
 }
 
 
