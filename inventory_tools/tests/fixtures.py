@@ -491,6 +491,7 @@ items = [
 		"item_price": 0.02,
 		"default_warehouse": "Storeroom - APC",
 		"supplier": ["Freedom Provisions", "Unity Bakery Supply"],
+		"uom_conversion_detail": {"Box": 100},
 	},
 	{
 		"item_code": "Salt",

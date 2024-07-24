@@ -27,6 +27,7 @@ function get_workstations(frm) {
 			query: 'inventory_tools.inventory_tools.overrides.workstation.get_alternative_workstations',
 			filters: {
 				operation: d.operation,
+				company: frm.doc.company,
 			},
 		}
 	})
