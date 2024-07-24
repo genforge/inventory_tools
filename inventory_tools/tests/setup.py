@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import datetime
 import types
 from itertools import groupby
@@ -620,9 +623,9 @@ def create_production_plan(settings, prod_plan_from_doc):
 		job_cards = frappe.get_all("Job Card", {"work_order": wo.name})
 		for job_card in job_cards:
 			job_card = frappe.get_doc("Job Card", job_card)
-			job_card.time_logs[0].completed_qty = wo.qty
+			job_card.append("time_logs", {"completed_qty": wo.qty})
 			job_card.save()
-			job_card.submit()  # don't submit to test alternative workstations
+			job_card.submit()
 
 
 def create_fruit_material_request(settings):
