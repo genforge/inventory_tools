@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 suppliers = [
 	(
 		"Freedom Provisions",
@@ -488,6 +491,7 @@ items = [
 		"item_price": 0.02,
 		"default_warehouse": "Storeroom - APC",
 		"supplier": ["Freedom Provisions", "Unity Bakery Supply"],
+		"uom_conversion_detail": {"Box": 100},
 	},
 	{
 		"item_code": "Salt",
