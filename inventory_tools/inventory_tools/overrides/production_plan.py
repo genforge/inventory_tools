@@ -10,7 +10,6 @@ from erpnext.manufacturing.doctype.production_plan.production_plan import Produc
 from erpnext.manufacturing.doctype.work_order.work_order import get_default_warehouse
 
 
-
 class InventoryToolsProductionPlan(ProductionPlan):
 	@frappe.whitelist()
 	def make_work_order(self):

@@ -124,7 +124,7 @@ def get_alternative_workstations(doctype, txt, searchfield, start, page_len, fil
 		"Workstation", default_workstation_name, searchfields, as_dict=True
 	)
 	if default_workstation_name not in [row[0] for row in workstation]:
-		field_values = ','.join([v for k, v in default_workstation_fields[0].items() if k != 'name'])
+		field_values = ",".join([v for k, v in default_workstation_fields[0].items() if k != "name"])
 		_default = tuple(
 			[
 				default_workstation_fields[0].name,

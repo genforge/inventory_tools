@@ -140,7 +140,10 @@ def test_validate_job_card():
 		"Job Card", {"work_order": work_order.name, "operation": work_order.operations[0].operation}
 	)
 	jc.delete()
-	start_time = frappe.get_value("Job Card Time Log", {"docstatus": 1}, "MAX(to_time) AS to_time") or get_datetime()
+	start_time = (
+		frappe.get_value("Job Card Time Log", {"docstatus": 1}, "MAX(to_time) AS to_time")
+		or get_datetime()
+	)
 	job_card = create_job_card(work_order, work_order.operations[0].as_dict(), auto_create=True)
 	batch_size, total_operation_time = frappe.get_value(
 		"Operation", job_card.operation, ["batch_size", "total_operation_time"]

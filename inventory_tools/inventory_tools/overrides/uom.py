@@ -8,20 +8,20 @@ from frappe.desk.search import search_link
 
 @frappe.whitelist()
 def uom_restricted_query(doctype, txt, searchfield, start, page_len, filters):
-	if 'company' in filters:
-		company = filters.pop('company')
+	if "company" in filters:
+		company = filters.pop("company")
 	else:
 		company = frappe.defaults.get_defaults().get("company")
 
 	if frappe.get_cached_value("Inventory Tools Settings", company, "enforce_uoms"):
 		return frappe.get_all(
-			'UOM Conversion Detail',
+			"UOM Conversion Detail",
 			filters=filters,
 			fields=["uom", "conversion_factor"],
 			limit_start=start,
 			limit_page_length=page_len,
 			as_list=True,
-			)
+		)
 	if "parent" in filters:
 		filters.pop("parent")
 	return execute(

@@ -199,7 +199,9 @@ def setup_manufacturing_settings(settings):
 	)
 	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
 	frappe.set_value("Inventory Tools Settings", settings.company, "enforce_uoms", 1)
-	frappe.set_value("Inventory Tools Settings", settings.company, "allow_alternative_workstations", 1)
+	frappe.set_value(
+		"Inventory Tools Settings", settings.company, "allow_alternative_workstations", 1
+	)
 	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
 	frappe.set_value(
 		"Inventory Tools Settings", settings.company, "overproduction_percentage_for_work_order", 50

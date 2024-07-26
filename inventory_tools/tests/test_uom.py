@@ -25,13 +25,11 @@ def test_uom_enforcement_validation():
 @pytest.mark.order(41)
 def test_uom_enforcement_query():
 	inventory_tools_settings = frappe.get_cached_doc(
-		"Inventory Tools Settings", 'Ambrosia Pie Company'
+		"Inventory Tools Settings", "Ambrosia Pie Company"
 	)
 	inventory_tools_settings.enforce_uoms = True
 	inventory_tools_settings.save()
-	inventory_tools_settings = frappe.get_cached_doc(
-		"Inventory Tools Settings", 'Chelsea Fruit Co'
-	)
+	inventory_tools_settings = frappe.get_cached_doc("Inventory Tools Settings", "Chelsea Fruit Co")
 	inventory_tools_settings.enforce_uoms = True
 	inventory_tools_settings.save()
 	response = frappe.call(
