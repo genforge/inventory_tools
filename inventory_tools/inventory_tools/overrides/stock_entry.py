@@ -54,18 +54,14 @@ class InventoryToolsStockEntry(StockEntry):
 
 	def validate_finished_goods(self):
 		"""
-		<<<<<<< HEAD
-		                HASH: 153e0ba81b62acc170a951a289363fff5579edc7
-		=======
-		                HASH: 54791e938bd56eb81f7d8d923381a006998919fe
-		>>>>>>> 12d5afa2ce39627719b130a5ed0e5ce879c818f6
-		                REPO: https://github.com/frappe/erpnext/
-		                PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
-		                METHOD: validate_finished_goods
+		HASH: 54791e938bd56eb81f7d8d923381a006998919fe
+		REPO: https://github.com/frappe/erpnext/
+		PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
+		METHOD: validate_finished_goods
 
-		                1. Check if FG exists (mfg, repack)
-		                2. Check if Multiple FG Items are present (mfg)
-		                3. Check FG Item and Qty against WO if present (mfg)
+		1. Check if FG exists (mfg, repack)
+		2. Check if Multiple FG Items are present (mfg)
+		3. Check FG Item and Qty against WO if present (mfg)
 		"""
 
 		production_item, wo_qty, finished_items = None, 0, []
@@ -124,17 +120,13 @@ class InventoryToolsStockEntry(StockEntry):
 
 	def get_pending_raw_materials(self, backflush_based_on=None):
 		"""
-		<<<<<<< HEAD
-		                HASH: 153e0ba81b62acc170a951a289363fff5579edc7
-		=======
-		                HASH: 54791e938bd56eb81f7d8d923381a006998919fe
-		>>>>>>> 12d5afa2ce39627719b130a5ed0e5ce879c818f6
-		                REPO: https://github.com/frappe/erpnext/
-		                PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
-		                METHOD: get_pending_raw_materials
+		HASH: 54791e938bd56eb81f7d8d923381a006998919fe
+		REPO: https://github.com/frappe/erpnext/
+		PATH: erpnext/stock/doctype/stock_entry/stock_entry.py
+		METHOD: get_pending_raw_materials
 
-		                issue (item quantity) that is pending to issue or desire to transfer,
-		                whichever is less
+		issue (item quantity) that is pending to issue or desire to transfer,
+		whichever is less
 		"""
 
 		item_dict = self.get_pro_order_required_items(backflush_based_on)
