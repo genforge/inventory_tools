@@ -1,17 +1,22 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import datetime
 import types
 from itertools import groupby
 
 import frappe
+from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+from frappe.utils.data import add_months, flt, getdate, nowdate, get_datetime
+
 from erpnext.accounts.doctype.account.account import update_account_number
-from erpnext.e_commerce.doctype.website_item.website_item import make_website_item
 from erpnext.manufacturing.doctype.production_plan.production_plan import (
 	get_items_for_material_requests,
 )
 from erpnext.setup.utils import enable_all_roles_and_domains, set_defaults_for_tests
 from erpnext.stock.get_item_details import get_item_details
-from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
-from frappe.utils.data import add_months, flt, getdate, nowdate
+
+from webshop.webshop.doctype.website_item.website_item import make_website_item
 
 from inventory_tools.tests.fixtures import (
 	attributes,
@@ -193,6 +198,9 @@ def setup_manufacturing_settings(settings):
 		"Inventory Tools Settings", settings.company, "enable_work_order_subcontracting", 1
 	)
 	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
+	frappe.set_value("Inventory Tools Settings", settings.company, "enforce_uoms", 1)
+	frappe.set_value("Inventory Tools Settings", settings.company, "allow_alternative_workstations", 1)
+	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
 	frappe.set_value(
 		"Inventory Tools Settings", settings.company, "overproduction_percentage_for_work_order", 50
 	)
@@ -295,7 +303,7 @@ def create_items(settings):
 		i.valuation_rate = item.get("valuation_rate") or 0
 		i.is_sub_contracted_item = item.get("is_sub_contracted_item") or 0
 		i.default_warehouse = settings.get("warehouse")
-		i.weight_uom = item.get("weight_uom", "Pound") if i.is_stock_item else None
+		i.weight_uom = item.get("weight_uom") if i.is_stock_item else None
 		i.weight_per_unit = item.get("weight_per_unit")
 		i.default_material_request_type = (
 			"Purchase"
@@ -636,11 +644,22 @@ def create_production_plan(settings, prod_plan_from_doc):
 		wo.save()
 		wo.submit()
 		job_cards = frappe.get_all("Job Card", {"work_order": wo.name})
+		start_time = get_datetime()
 		for job_card in job_cards:
 			job_card = frappe.get_doc("Job Card", job_card)
-			job_card.time_logs[0].completed_qty = wo.qty
-			job_card.save()
-			job_card.submit()
+			batch_size, total_operation_time = frappe.get_value(
+				"Operation", job_card.operation, ["batch_size", "total_operation_time"]
+			)
+			time_in_mins = (total_operation_time / batch_size) * wo.qty
+			job_card.append(
+				"time_logs",
+				{
+					"completed_qty": wo.qty,
+					"from_time": start_time,
+					"to_time": start_time + datetime.timedelta(minutes=time_in_mins),
+					"time_in_mins": time_in_mins,
+				},
+			)
 
 
 def create_fruit_material_request(settings):

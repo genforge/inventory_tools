@@ -3,7 +3,6 @@
 
 import json
 import types
-from typing import Union
 
 import frappe
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import (
@@ -26,11 +25,12 @@ def _bypass(*args, **kwargs):
 class InventoryToolsPurchaseOrder(PurchaseOrder):
 	def validate_with_previous_doc(self):
 		"""
-		HASH: 4d34b1ead73baf4c5430a2ecbe44b9e8468d7626
+		HASH: 7cc5579ecaae99336b8164e7aeedc15b990d2257
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/buying/doctype/purchase_order/purchase_order.py
 		METHOD: validate_with_previous_doc
 		"""
+
 		config = {
 			"Supplier Quotation": {
 				"ref_dn_field": "supplier_quotation",
@@ -108,7 +108,7 @@ class InventoryToolsPurchaseOrder(PurchaseOrder):
 
 
 @frappe.whitelist()
-def make_purchase_invoices(docname: str, rows: Union[list, str]) -> None:
+def make_purchase_invoices(docname: str, rows: list | str) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	forwarding = frappe._dict()
@@ -132,7 +132,7 @@ def make_purchase_invoices(docname: str, rows: Union[list, str]) -> None:
 
 
 @frappe.whitelist()
-def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
+def make_purchase_receipts(docname: str, rows: list | str) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	forwarding = frappe._dict()
@@ -155,7 +155,7 @@ def make_purchase_receipts(docname: str, rows: Union[list, str]) -> None:
 
 
 @frappe.whitelist()
-def make_sales_invoices(docname: str, rows: Union[list, str]) -> None:
+def make_sales_invoices(docname: str, rows: list | str) -> None:
 	rows = json.loads(rows) if isinstance(rows, str) else rows
 	doc = frappe.get_doc("Purchase Order", docname)
 	buying_settings = frappe.get_doc("Buying Settings", "Buying Settings")
@@ -225,11 +225,12 @@ def make_sales_invoices(docname: str, rows: Union[list, str]) -> None:
 @frappe.whitelist()
 def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=True):
 	"""
-	HASH: 0bee921d402060abe6c06568dd3f600d1445719f
+	HASH: d396c18689e530d3f11a791ef1064c2d9775466e
 	REPO: https://github.com/frappe/erpnext/
 	PATH: erpnext/stock/get_item_details.py
 	METHOD: get_item_details
 	"""
+
 	import erpnext.stock.get_item_details
 
 	erpnext.stock.get_item_details.validate_item_details = validate_item_details
@@ -242,11 +243,12 @@ def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=Tru
 @frappe.whitelist()
 def validate_item_details(args, item):
 	"""
-	HASH: 0bee921d402060abe6c06568dd3f600d1445719f
+	HASH: d396c18689e530d3f11a791ef1064c2d9775466e
 	REPO: https://github.com/frappe/erpnext/
 	PATH: erpnext/stock/get_item_details.py
 	METHOD: validate_item_details
 	"""
+
 	if not args.company:
 		throw(_("Please specify Company"))
 

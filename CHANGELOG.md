@@ -1,5 +1,7 @@
-# CHANGELOG
+<!-- Copyright (c) 2024, AgriTheory and contributors
+For license information, please see license.txt-->
 
+# CHANGELOG
 
 
 ## v14.6.0 (2024-05-13)
@@ -707,3 +709,4 @@ feat: add setting doctype ([`5285a99`](https://github.com/agritheory/inventory_t
 fix: module import name ([`6edf7fb`](https://github.com/agritheory/inventory_tools/commit/6edf7fb0127648c90b0e3c203473681b8b964b63))
 
 * initial commit ([`a09e1ed`](https://github.com/agritheory/inventory_tools/commit/a09e1ed6724ea49e39d5e208e6031283bf282f97))
+

@@ -2,9 +2,9 @@
 	<div>
 		<div>
 			<span class="min-max-inputs">
-				<input class="form-control form-input" type="date" v-model="minFilterValue" @change="change">
+				<input class="form-control form-input" type="date" v-model="minFilterValue" @change="change" />
 				&nbsp;
-				<input class="form-control form-input " type="date" v-model="maxFilterValue" @change="change">
+				<input class="form-control form-input" type="date" v-model="maxFilterValue" @change="change" />
 			</span>
 		</div>
 	</div>
@@ -21,21 +21,19 @@ export default {
 	},
 	methods: {
 		change() {
-			this.$emit(
-				'update_filters',
-				{
-					'attribute_name': this.attribute_name,
-					'attribute_id': this.attribute_id,
-					'values': [this.minFilterValue, this.maxFilterValue]
-				})
-		}
+			this.$emit('update_filters', {
+				attribute_name: this.attribute_name,
+				attribute_id: this.attribute_id,
+				values: [this.minFilterValue, this.maxFilterValue],
+			})
+		},
 	},
 	mounted() {
-		if(this.values){
+		if (this.values) {
 			this.minFilterValue = moment(this.values[0] * 1000).format('YYYY-MM-DD')
 			this.maxFilterValue = moment(this.values[1] * 1000).format('YYYY-MM-DD')
 		}
-	}
+	},
 }
 </script>
 <style scoped>
@@ -55,7 +53,7 @@ export default {
 	margin-top: 30px;
 }
 
-#slider-div>div {
+#slider-div > div {
 	margin: 8px;
 }
 
@@ -66,4 +64,3 @@ export default {
 	font-size: 0.75rem;
 }
 </style>
-

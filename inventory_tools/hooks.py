@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 from . import __version__ as app_version
 
 app_name = "inventory_tools"
@@ -6,7 +9,7 @@ app_publisher = "AgriTheory"
 app_description = "Inventory Tools"
 app_email = "support@agritheory.dev"
 app_license = "MIT"
-required_apps = ["erpnext", "hrms"]
+required_apps = ["erpnext", "hrms", "webshop"]
 
 # Includes in <head>
 # ------------------
@@ -43,11 +46,12 @@ web_include_js = [
 doctype_js = {
 	"Item": "public/js/custom/item_custom.js",
 	"Job Card": "public/js/custom/job_card_custom.js",
+	"Operation": "public/js/custom/operation_custom.js",
 	"Purchase Invoice": "public/js/custom/purchase_invoice_custom.js",
 	"Purchase Order": "public/js/custom/purchase_order_custom.js",
-	"Operation": "public/js/custom/operation_custom.js",
 	"Stock Entry": "public/js/custom/stock_entry_custom.js",
 	"Work Order": "public/js/custom/work_order_custom.js",
+	"Workstation": "public/js/custom/workstation_custom.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -128,6 +132,7 @@ override_doctype_class = {
 	"Sales Order": "inventory_tools.inventory_tools.overrides.sales_order.InventoryToolsSalesOrder",
 	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
 	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
+	"Workstation": "inventory_tools.inventory_tools.overrides.workstation.InventoryToolsWorkstation",
 }
 
 

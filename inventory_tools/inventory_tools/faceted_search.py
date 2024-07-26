@@ -1,10 +1,13 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import json
 from time import localtime
 
 import frappe
-from erpnext.e_commerce.product_data_engine.filters import ProductFiltersBuilder
-from erpnext.e_commerce.product_data_engine.query import ProductQuery
-from erpnext.setup.doctype.item_group.item_group import get_child_groups_for_website
+from webshop.webshop.product_data_engine.filters import ProductFiltersBuilder
+from webshop.webshop.product_data_engine.query import ProductQuery
+from webshop.webshop.doctype.override_doctype.item_group import get_child_groups_for_website
 from frappe.utils.data import cint, flt, getdate
 
 from inventory_tools.inventory_tools.doctype.specification.specification import convert_to_epoch

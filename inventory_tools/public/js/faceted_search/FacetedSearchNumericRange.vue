@@ -1,16 +1,12 @@
 <template>
-<div>
 	<div>
-		<div class="min-max-inputs">
-			<input class="form-control form-input" type="text" v-model="minFilterValue"
-			@change="change"
-			>
-			<input class="form-control form-input" type="text" v-model="maxFilterValue"
-			@change="change"
-			>
+		<div>
+			<div class="min-max-inputs">
+				<input class="form-control form-input" type="text" v-model="minFilterValue" @change="change" />
+				<input class="form-control form-input" type="text" v-model="maxFilterValue" @change="change" />
+			</div>
 		</div>
 	</div>
-</div>
 </template>
 <script>
 export default {
@@ -24,49 +20,46 @@ export default {
 	},
 	methods: {
 		change() {
-			this.$emit(
-				'update_filters',
-				{
-					'attribute_name': this.attribute_name,
-					'attribute_id': this.attribute_id,
-					'values': [this.minFilterValue, this.maxFilterValue]
-				})
-		}
+			this.$emit('update_filters', {
+				attribute_name: this.attribute_name,
+				attribute_id: this.attribute_id,
+				values: [this.minFilterValue, this.maxFilterValue],
+			})
+		},
 	},
 	mounted() {
 		if (this.values) {
 			this.minFilterValue = this.values[0]
 			this.maxFilterValue = this.values[1]
 		}
-	}
+	},
 }
 </script>
 <style scoped>
 .min-max-inputs {
 	display: inline;
-	white-space:nowrap;
+	white-space: nowrap;
 }
-.min-max-inputs input{
+.min-max-inputs input {
 	display: inline;
 	max-width: 10ch;
 	text-align: right;
 }
 
 #slider-div {
-  display: flex;
-  flex-direction: row;
-  margin-top: 30px;
+	display: flex;
+	flex-direction: row;
+	margin-top: 30px;
 }
 
-#slider-div>div {
-  margin: 8px;
+#slider-div > div {
+	margin: 8px;
 }
 
 .slider-label {
-  position: absolute;
-  background-color: #eee;
-  padding: 4px;
-  font-size: 0.75rem;
+	position: absolute;
+	background-color: #eee;
+	padding: 4px;
+	font-size: 0.75rem;
 }
 </style>
-

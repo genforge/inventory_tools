@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import json
 from pathlib import Path
 
@@ -6,7 +9,7 @@ import frappe
 
 def load_customizations():
 	customizations_directory = (
-		Path().cwd().parent / "apps" / "check_run" / "check_run" / "check_run" / "custom"
+		Path().cwd().parent / "apps" / "inventory_tools" / "inventory_tools" / "inventory_tools" / "custom"
 	)
 	files = list(customizations_directory.glob("**/*.json"))
 	for file in files:

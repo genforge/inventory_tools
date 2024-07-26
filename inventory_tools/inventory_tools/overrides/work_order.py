@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import frappe
 from erpnext.manufacturing.doctype.work_order.work_order import (
 	OverProductionError,
@@ -8,13 +11,13 @@ from erpnext.manufacturing.doctype.work_order.work_order import (
 	make_stock_entry as _make_stock_entry,
 )
 from frappe import _
-from frappe.utils import flt, get_link_to_form, getdate
+from frappe.utils import cint, flt, get_link_to_form, getdate
 
 
 class InventoryToolsWorkOrder(WorkOrder):
 	def onload(self):
 		"""
-		HASH: 4d34b1ead73baf4c5430a2ecbe44b9e8468d7626
+		HASH: ef2553edf967612bdbf580357d5886c6afacaea2
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/manufacturing/doctype/work_order/work_order.py
 		METHOD: onload
@@ -110,7 +113,7 @@ class InventoryToolsWorkOrder(WorkOrder):
 
 	def update_work_order_qty(self):
 		"""
-		HASH: 4d34b1ead73baf4c5430a2ecbe44b9e8468d7626
+		HASH: ef2553edf967612bdbf580357d5886c6afacaea2
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/manufacturing/doctype/work_order/work_order.py
 		METHOD: update_work_order_qty
@@ -156,7 +159,7 @@ class InventoryToolsWorkOrder(WorkOrder):
 
 	def update_operation_status(self):
 		"""
-		HASH: 4d34b1ead73baf4c5430a2ecbe44b9e8468d7626
+		HASH: ef2553edf967612bdbf580357d5886c6afacaea2
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/manufacturing/doctype/work_order/work_order.py
 		METHOD: update_operation_status
@@ -179,7 +182,7 @@ class InventoryToolsWorkOrder(WorkOrder):
 
 	def validate_qty(self):
 		"""
-		HASH: 4d34b1ead73baf4c5430a2ecbe44b9e8468d7626
+		HASH: ef2553edf967612bdbf580357d5886c6afacaea2
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/manufacturing/doctype/work_order/work_order.py
 		METHOD: validate_qty
@@ -187,6 +190,21 @@ class InventoryToolsWorkOrder(WorkOrder):
 
 		if not self.qty > 0:
 			frappe.throw(_("Quantity to Manufacture must be greater than 0."))
+
+		if (
+			self.stock_uom
+			and frappe.get_cached_value("UOM", self.stock_uom, "must_be_whole_number")
+			and abs(cint(self.qty) - flt(self.qty, self.precision("qty"))) > 0.0000001
+		):
+			frappe.throw(
+				_(
+					"Qty To Manufacture ({0}) cannot be a fraction for the UOM {2}. To allow this, disable '{1}' in the UOM {2}."
+				).format(
+					flt(self.qty, self.precision("qty")),
+					frappe.bold(_("Must be Whole Number")),
+					frappe.bold(self.stock_uom),
+				),
+			)
 
 		if (
 			self.production_plan

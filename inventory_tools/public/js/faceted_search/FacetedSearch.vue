@@ -33,8 +33,8 @@ export default {
 		doctype: {
 			type: String,
 			required: true,
-			default: 'Item'
-		}
+			default: 'Item',
+		},
 	},
 	data() {
 		return { searchComponents: [], filterValues: {}, sortOrder: '' }
@@ -50,7 +50,7 @@ export default {
 			if ('sort_order' in values) {
 				this.sortOrder = values
 			} else {
-				this.filterValues[values.attribute_name] = { attribute_id: values.attribute_id, values: values.values}
+				this.filterValues[values.attribute_name] = { attribute_id: values.attribute_id, values: values.values }
 			}
 
 			watchDebounced(
@@ -59,46 +59,49 @@ export default {
 					console.log('changed!')
 					await this.setFilterValues()
 				},
-				{ debounce: 500, maxWait: 1000 },
+				{ debounce: 500, maxWait: 1000 }
 			)
 		},
 		loadFacets() {
-			frappe.call({
-				method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
-				args: { 'doctype': this.doctype, 'filters': this.filterValues },
-				headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
-			},
-			).then(r => {
-				this.searchComponents = r.message
-				for (const value of Object.values(r.message)) {
-					this.updateFilters(value)
-				}
-			})
+			frappe
+				.call({
+					method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
+					args: { doctype: this.doctype, filters: this.filterValues },
+					headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
+				})
+				.then(r => {
+					this.searchComponents = r.message
+					for (const value of Object.values(r.message)) {
+						this.updateFilters(value)
+					}
+				})
 		},
 		async setFilterValues() {
 			if (erpnext.e_commerce) {
-				frappe.xcall('erpnext.e_commerce.api.get_product_filter_data', {
-					query_args: { attributes: this.filterValues, sort_order: this.sortOrder }
-				}).then(r => {
-					let view_type = localStorage.getItem("product_view") || "List View";
-					if (!r.items) {
-						return
-					} else if (view_type == 'List View') {
-						new erpnext.ProductList({
-							items: r.items,
-							products_section: $("#products-list-area"),
-							settings: r.settings,
-							preference: view_type
-						})
-					} else {
-						new erpnext.ProductGrid({
-							items: r.items,
-							products_section: $("#products-grid-area"),
-							settings: r.settings,
-							preference: view_type
-						})
-					}
-				})
+				frappe
+					.xcall('erpnext.e_commerce.api.get_product_filter_data', {
+						query_args: { attributes: this.filterValues, sort_order: this.sortOrder },
+					})
+					.then(r => {
+						let view_type = localStorage.getItem('product_view') || 'List View'
+						if (!r.items) {
+							return
+						} else if (view_type == 'List View') {
+							new erpnext.ProductList({
+								items: r.items,
+								products_section: $('#products-list-area'),
+								settings: r.settings,
+								preference: view_type,
+							})
+						} else {
+							new erpnext.ProductGrid({
+								items: r.items,
+								products_section: $('#products-grid-area'),
+								settings: r.settings,
+								preference: view_type,
+							})
+						}
+					})
 			} else {
 				const items = await frappe.xcall('inventory_tools.inventory_tools.faceted_search.get_specification_items', {
 					attributes: this.filterValues,
@@ -160,7 +163,7 @@ export default {
 			listview.filter_area.set(filters)
 			listview.refresh()
 		},
-	}
+	},
 }
 </script>
 
@@ -210,5 +213,5 @@ export default {
 	.scrollable-filter:hover {
 		scrollbar-color: var(--primary) #eee;
 	}
- }
+}
 </style>

@@ -3,7 +3,7 @@
 		<div class="colorpicker">
 			<div v-for="(attr, idx) in selectedValues" :key="idx" class="color-card" @click="selectColor(attr, idx)">
 				<div class="color-display" :style="getBackground(attr)">
-					<p :style="{ 'color': attr.isChecked ? contrast(attr.attribute[1]) : 'transparent' }">✓</p>
+					<p :style="{ color: attr.isChecked ? contrast(attr.attribute[1]) : 'transparent' }">✓</p>
 				</div>
 				<span> {{ attr.attribute[0] }} </span>
 			</div>
@@ -45,14 +45,17 @@ export default {
 		},
 		contrast(color) {
 			if (
-				(['E', 'F'].includes(color.substring(1, 2).toUpperCase()) && ['E', 'F'].includes(color.substring(3, 4).toUpperCase())) ||
-				(['E', 'F'].includes(color.substring(3, 4).toUpperCase()) && ['E', 'F'].includes(color.substring(5, 6).toUpperCase())) ||
-				(['E', 'F'].includes(color.substring(1, 2).toUpperCase()) && ['E', 'F'].includes(color.substring(5, 6).toUpperCase()))
+				(['E', 'F'].includes(color.substring(1, 2).toUpperCase()) &&
+					['E', 'F'].includes(color.substring(3, 4).toUpperCase())) ||
+				(['E', 'F'].includes(color.substring(3, 4).toUpperCase()) &&
+					['E', 'F'].includes(color.substring(5, 6).toUpperCase())) ||
+				(['E', 'F'].includes(color.substring(1, 2).toUpperCase()) &&
+					['E', 'F'].includes(color.substring(5, 6).toUpperCase()))
 			) {
 				return '	#192734'
 			}
 			return 'white'
-		}
+		},
 	},
 	mounted() {
 		if (this.values) {
@@ -83,7 +86,7 @@ input {
 
 .color-display {
 	display: flex;
-	min-height: .75rem;
+	min-height: 0.75rem;
 	clip-path: circle(40%);
 	flex-direction: column;
 	justify-content: center;

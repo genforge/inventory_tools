@@ -19,9 +19,7 @@ export default {
 			this.$emit('update_filters', {
 				attribute_name: this.attribute_name,
 				attribute_id: this.attribute_id,
-				values: this.selectedValues
-					.map(r => r.isChecked ? r.attribute : null)
-					.filter(r => r != null),
+				values: this.selectedValues.map(r => (r.isChecked ? r.attribute : null)).filter(r => r != null),
 			})
 		},
 	},

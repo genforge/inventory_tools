@@ -13,11 +13,12 @@ from frappe.utils.data import cint
 class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 	def validate_with_previous_doc(self):
 		"""
-		HASH: 014486de39dd7da6fe79bf803adcf1b66d890876
+		HASH: 804f1d4772e80994be17b276d9a0af7b66dde20d
 		REPO: https://github.com/frappe/erpnext/
 		PATH: erpnext/accounts/doctype/purchase_invoice/purchase_invoice.py
 		METHOD: validate_with_previous_doc
 		"""
+
 		config = {
 			"Purchase Order": {
 				"ref_dn_field": "purchase_order",
@@ -39,6 +40,7 @@ class InventoryToolsPurchaseInvoice(PurchaseInvoice):
 				"is_child_table": True,
 			},
 		}
+
 		pos = list({r.purchase_order for r in self.items})
 		if len(pos) == 1 and frappe.get_value("Purchase Order", pos[0], "multi_company_purchase_order"):
 			config["Purchase Order"]["compare_fields"] = [["currency", "="]]

@@ -1,3 +1,6 @@
+// Copyright (c) 2024, AgriTheory and contributors
+// For license information, please see license.txt
+
 frappe.provide('inventory_tools')
 
 inventory_tools.specification_dialog = async frm => {
