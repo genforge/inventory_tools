@@ -50,6 +50,7 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app hrms --branch "${BRANCH_NAME}" --skip-assets --overwrite
 bench get-app erpnext --branch "${BRANCH_NAME}" --skip-assets --overwrite
+bench get-app webshop --branch "${BRANCH_NAME}" --skip-assets --overwrite
 bench get-app inventory_tools "${GITHUB_WORKSPACE}" --skip-assets
 
 printf '%s\n' 'frappe' 'erpnext' 'hrms' 'inventory_tools' > ~/frappe-bench/sites/apps.txt
