@@ -119,7 +119,6 @@ def test_manual_attribute_addition():
 			"reference_doctype": "Item",
 			"reference_name": item,
 			"specification": "Items",
-
 		}
 		values = frappe.call(
 			"inventory_tools.inventory_tools.doctype.specification.specification.get_specification_values",
@@ -128,9 +127,7 @@ def test_manual_attribute_addition():
 		for attribute, manual_values in fixtures_values.items():
 			if isinstance(manual_values, list):
 				for v in manual_values:
-					values.append(
-						{"row_name": "", "attribute": attribute, "value": v, "specification": "Items"}
-					)
+					values.append({"row_name": "", "attribute": attribute, "value": v, "specification": "Items"})
 			else:
 				values.append(
 					{
@@ -152,9 +149,7 @@ def test_manual_attribute_addition():
 			**args
 		)
 	assert (
-		len(
-			frappe.get_all("Specification Value", {"specification": "Items", "attribute": "Color"})
-		)
+		len(frappe.get_all("Specification Value", {"specification": "Items", "attribute": "Color"}))
 		== 25
 	)  # all colors in baked goods items from fixtures
 
