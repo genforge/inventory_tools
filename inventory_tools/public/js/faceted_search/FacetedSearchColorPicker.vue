@@ -52,9 +52,10 @@ export default {
 				(['E', 'F'].includes(color.substring(1, 2).toUpperCase()) &&
 					['E', 'F'].includes(color.substring(5, 6).toUpperCase()))
 			) {
-				return '	#192734'
+				return '#192734'
+			} else {
+				return 'white'
 			}
-			return 'white'
 		},
 	},
 	mounted() {
@@ -82,6 +83,10 @@ export default {
 
 input {
 	display: none;
+}
+
+.scrollable-filter {
+	min-height: 12.5rem;
 }
 
 .color-display {

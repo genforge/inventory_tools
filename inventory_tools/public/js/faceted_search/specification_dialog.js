@@ -11,12 +11,15 @@ inventory_tools.specification_dialog = async frm => {
 		is_new = true
 	}
 	let apply_on_fields = await get_apply_on_fields(frm)
-	let current_spec = ''
 	let attributes = get_attributes(data)
-	if (data.length) {
-		current_spec = data[0].specification
-	}
 	let fields = [
+		{
+			fieldtype: 'Data',
+			fieldname: 'specification',
+			label: __('Specification'),
+			in_list_view: 1,
+			read_only: 1,
+		},
 		{
 			fieldtype: 'Select',
 			fieldname: 'attribute',
@@ -54,8 +57,8 @@ inventory_tools.specification_dialog = async frm => {
 					fieldtype: 'Link',
 					options: 'Specification',
 					read_only: frm.doc.doctype == 'Specification' ? 1 : 0,
-					default: frm.doc.doctype == 'Specification' ? frm.doc.name : current_spec,
-					onchange: async () => {
+					default: frm.doc.doctype == 'Specification' ? frm.doc.name : '',
+					on_change: async () => {
 						values = d.get_values()
 						if (values && values.specification && is_new) {
 							let _data = await get_specification_values(frm, values.specification)
@@ -107,6 +110,11 @@ inventory_tools.specification_dialog = async frm => {
 					data: data,
 					fields: fields,
 				},
+				{
+					fieldtype: 'HTML',
+					fieldname: 'table-notes',
+					options: __('<p>To remove a non-computed value, remove the contents of the "Value" field</p>'),
+				},
 			],
 			primary_action: () => {
 				let values = d.get_values()
@@ -127,24 +135,16 @@ inventory_tools.specification_dialog = async frm => {
 				resolve(d.hide())
 			},
 			primary_action_label: frm.doc.doctype == 'Specification' ? __('Generate') : __('Save'),
-			size: 'large',
+			size: 'extra-large',
 		})
 		d.show()
 		d.fields_dict.specification.get_query = () => {
-			let filters = []
-			apply_on_fields.map(spec => {
-				let key = frappe.scrub(spec.dt, '_')
-				if (spec.dt && spec.apply_on) {
-					if (spec.apply_on == frm.doc[key]) {
-						filters.push([key, '=', frm.doc[key]])
-					} else {
-						filters.push(['apply_on', '!=', spec.apply_on])
-					}
-				}
-			})
 			return {
 				query: 'inventory_tools.inventory_tools.doctype.specification.specification.specification_query',
-				filters: filters,
+				filters: {
+					reference_doctype: frm.doc.doctype,
+					reference_name: frm.doc.name,
+				},
 			}
 		}
 		let values = d.get_values()

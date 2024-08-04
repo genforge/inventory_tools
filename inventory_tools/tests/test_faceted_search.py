@@ -4,6 +4,8 @@
 import frappe
 import pytest
 
+from inventory_tools.tests.fixtures import attributes
+
 # don't generate spec values in setup
 # create overlapping spec (Item)
 
@@ -17,6 +19,7 @@ import pytest
 # 	s.create_linked_values(spec_item, attributes[spec_item.name])
 
 
+@pytest.mark.order(70)
 def test_values_updated_on_item_save():
 	# assert spec value doesn't exist
 	frappe.flags.in_test = True
@@ -62,6 +65,7 @@ def test_values_updated_on_item_save():
 		frappe.delete_doc("Specification Value", value.name, force=True)
 
 
+@pytest.mark.order(71)
 def test_generate_values():
 	frappe.flags.in_test = True
 	doc = frappe.get_doc("Specification", "Items")
@@ -84,10 +88,12 @@ def test_generate_values():
 	)  # total items x computed attributes
 
 
+@pytest.mark.order(72)
 def test_generate_values_on_overlapping_items():
 	frappe.flags.in_test = True
 	doc = frappe.get_doc("Specification", "Baked Goods")
 	assert len(doc.attributes) == 4
+	assert len(frappe.get_all("Specification Value", {"specification": doc.name})) == 0
 	frappe.call(
 		"inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values",
 		**{
@@ -106,6 +112,91 @@ def test_generate_values_on_overlapping_items():
 	)  # total items x computed attributes
 
 
+@pytest.mark.order(73)
+def test_manual_attribute_addition():
+	for item, fixtures_values in attributes.items():
+		_args = {
+			"reference_doctype": "Item",
+			"reference_name": item,
+			"specification": "Baked Goods",
+		}
+		values = frappe.call(
+			"inventory_tools.inventory_tools.doctype.specification.specification.get_specification_values",
+			**_args
+		)
+		for attribute, manual_values in fixtures_values.items():
+			if isinstance(manual_values, list):
+				for v in manual_values:
+					values.append(
+						{"row_name": "", "attribute": attribute, "value": v, "specification": "Baked Goods"}
+					)
+			else:
+				values.append(
+					{
+						"row_name": "",
+						"attribute": attribute,
+						"value": manual_values,
+						"specification": "Baked Goods",
+					}
+				)
+		# print(existing_values)
+		args = {
+			"spec": "Baked Goods",
+			"specifications": frappe.as_json(values),
+			"reference_doctype": "Item",
+			"reference_name": item,
+		}
+		frappe.call(
+			"inventory_tools.inventory_tools.doctype.specification.specification.update_specification_values",
+			**args
+		)
+	assert (
+		len(
+			frappe.get_all("Specification Value", {"specification": "Baked Goods", "attribute": "Color"})
+		)
+		== 25
+	)  # all colors in baked goods items from fixtures
+
+
+@pytest.mark.order(74)
 def test_delete_of_specification_value():
 	frappe.flags.in_test = True
-	# via update_specification_values
+	_args = {
+		"reference_doctype": "Item",
+		"reference_name": "Ambrosia Pie",
+		"specification": "Baked Goods",
+	}
+	values = frappe.call(
+		"inventory_tools.inventory_tools.doctype.specification.specification.get_specification_values",
+		**_args
+	)
+	assert "Blue" in [v.value for v in values if v.attribute == "Color"]
+	assert len(values) == 11
+
+	for v in values:
+		if v.attribute == "Color" and v.value == "Blue":
+			v.value = None
+
+	args = {
+		"spec": _args.get("specification"),
+		"specifications": frappe.as_json(values),
+		"reference_doctype": _args.get("reference_doctype"),
+		"reference_name": _args.get("reference_name"),
+	}
+	frappe.call(
+		"inventory_tools.inventory_tools.doctype.specification.specification.update_specification_values",
+		**args
+	)
+	assert (
+		len(
+			frappe.get_all(
+				"Specification Value",
+				{
+					"specification": "Baked Goods",
+					"attribute": "Color",
+					"reference_name": _args.get("reference_name"),
+				},
+			)
+		)
+		== 1
+	)  # all colors in baked goods items from fixtures

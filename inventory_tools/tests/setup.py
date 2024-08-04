@@ -823,3 +823,17 @@ def create_specifications(settings=None):
 			for at in spec.get("attributes"):
 				s.append("attributes", at)
 			s.save()
+
+
+def create_demo_specification_values():
+	from inventory_tools.tests.test_faceted_search import (
+		test_values_updated_on_item_save,
+		test_generate_values,
+		test_generate_values_on_overlapping_items,
+		test_manual_attribute_addition,
+	)
+
+	test_values_updated_on_item_save()
+	test_generate_values()
+	test_generate_values_on_overlapping_items()
+	test_manual_attribute_addition()

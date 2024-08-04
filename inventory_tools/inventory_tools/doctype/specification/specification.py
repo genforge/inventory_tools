@@ -4,14 +4,16 @@
 import datetime
 import json
 import time
+from pytz import timezone
+from dateutil.relativedelta import relativedelta
 
 import frappe
-from erpnext.controllers.queries import get_fields
 from frappe.core.doctype.doctype.doctype import no_value_fields, table_fields
 from frappe.model.document import Document
 from frappe.query_builder import DocType
-from frappe.utils.data import flt, get_datetime
-from pytz import UnknownTimeZoneError, timezone
+from frappe.utils.data import flt, get_datetime, getdate
+
+from erpnext.controllers.queries import get_fields
 
 
 class Specification(Document):
@@ -20,36 +22,15 @@ class Specification(Document):
 		if self.apply_on:
 			self.title += f" - {self.apply_on}"
 
-	def before_save(self):
-		# get Specification attributes name based on parent which are in same order as newly updated attributes
-		stored_attribute_names = set(
-			frappe.get_all(
-				"Specification Attribute", {"parent": self.name}, pluck="attribute_name", order_by="idx"
-			)
-		)
-		new_attribute_names = {attr.attribute_name for attr in self.attributes}
-		# get none matching attributes from each set
-		old_name = list(stored_attribute_names - new_attribute_names)
-		new_name = list(new_attribute_names - stored_attribute_names)
-
-		# for will allow us to process changes done in multiple rows
-		for index in range(0, len(old_name)):
-			frappe.enqueue(
-				update_specification_value_attribute_name, old_name=old_name[index], new_name=new_name[index]
-			)
-
 	def create_linked_values(self, doc, extra_attributes=None):
-		if not self.name:
-			return
 		for at in self.attributes:
 			if at.field:
 				existing_attribute_value = frappe.db.get_value(
 					"Specification Value",
 					{
-						"reference_doctype": doc.doctype,
+						"reference_doctype": at.applied_on,
 						"reference_name": doc.name,
 						"attribute": at.attribute_name,
-						"field": at.field,
 						"specification": self.name,
 					},
 				)
@@ -60,15 +41,14 @@ class Specification(Document):
 					av = frappe.new_doc("Specification Value")
 					av.reference_doctype = at.applied_on
 					av.reference_name = doc.name
+					av.specification = self.name
 					av.attribute = at.attribute_name
 					av.field = at.field
-					av.value = frappe.get_value(av.reference_doctype, av.reference_name, at.field)
+					av.value = doc.get(at.field)
 				if at.date_values:
 					av.value = convert_to_epoch(av.value)
-				av.specification = self.name
-				av.save()
-				continue
-
+				if av.value:
+					av.save()
 			if extra_attributes and at.attribute_name in extra_attributes:
 				if isinstance(extra_attributes[at.attribute_name], (str, int, float)):
 					existing_attribute_value = frappe.db.get_value(
@@ -89,7 +69,6 @@ class Specification(Document):
 					av.value = extra_attributes[at.attribute_name]
 					if at.date_values:
 						av.value = convert_to_epoch(av.value)
-					av.specification = self.name
 					av.save()
 					continue
 
@@ -97,15 +76,12 @@ class Specification(Document):
 					continue
 
 				for value in extra_attributes[at.attribute_name]:  # list, tuple or set / not dict
-					if value is not None:
-						continue
 					existing_attribute_value = frappe.db.get_value(
 						"Specification Value",
 						{
 							"reference_doctype": at.applied_on,
 							"reference_name": doc.name,
 							"attribute": at.attribute_name,
-							"value": value,  # this make this an add-only API
 						},
 					)
 					if existing_attribute_value:
@@ -118,7 +94,6 @@ class Specification(Document):
 					av.value = value
 					if at.date_values:
 						av.value = convert_to_epoch(av.value)
-					av.specification = self.name
 					av.save()
 
 	@property
@@ -135,37 +110,22 @@ class Specification(Document):
 				return True
 
 
-def update_specification_value_attribute_name(old_name, new_name):
-	specification_values = frappe.get_all(
-		"Specification Value", {"attribute": old_name}, pluck="name"
-	)
-	for specification_value in specification_values:
-		frappe.db.set_value("Specification Value", specification_value, "attribute", new_name)
-
-
 def convert_to_epoch(date):
-	tzname = time.tzname if isinstance(time.tzname, (int, str)) else time.tzname[0]
-
-	try:
-		tz = timezone(tzname)
-	except UnknownTimeZoneError:
-		# default to beginning of epoch
-		return
-
-	d = datetime.datetime.now(tz)  # or some other local date
-	utc_offset = d.utcoffset()
-	if utc_offset:
-		utc_offset_seconds = utc_offset.total_seconds()
-		offset_d = (
-			get_datetime(date) - datetime.timedelta(hours=12, seconds=int(utc_offset_seconds))
-		) - get_datetime("1970-01-01")
-		return offset_d.total_seconds()
-	return
+	system_settings = frappe.get_cached_doc("System Settings", "System Settings")
+	d = datetime.datetime.now(
+		timezone(time.tzname if isinstance(time.tzname, (int, str)) else time.tzname[0])
+	)  # or some other local date )
+	utc_offset = d.utcoffset().total_seconds()
+	return (
+		(get_datetime(date) - datetime.timedelta(hours=12, seconds=int(utc_offset)))
+		- get_datetime("1970-1-1")
+	).total_seconds()
 
 
 def convert_from_epoch(date):
+	system_settings = frappe.get_cached_doc("System Settings", "System Settings")
 	d = datetime.datetime.utcfromtimestamp(int(flt(date)))
-	utc_offset = d.utcoffset().total_seconds() if d.utcoffset() else 0.0
+	utc_offset = d.utcoffset().total_seconds() if d.utcoffset() else 0
 	return (d + datetime.timedelta(hours=12, seconds=int(utc_offset))).date()
 
 
@@ -177,95 +137,79 @@ def get_data_fieldnames(doctype):
 	)
 
 
+def get_applicable_specification(doc):
+	doc = frappe.get_doc(json.loads(doc)) if isinstance(doc, str) else doc
+	if doc.doctype != "Item":  # implement other doctypes later
+		return
+	applicable_specifications = []
+	specification_candidates = frappe.db.sql(
+		"""
+		SELECT DISTINCT `tabSpecification`.name,
+		`tabSpecification`.dt,
+		`tabSpecification`.apply_on
+		FROM `tabSpecification`, `tabSpecification Attribute`
+		WHERE `tabSpecification`.name = `tabSpecification Attribute`.parent
+		AND `tabSpecification Attribute`.applied_on = %(doctype)s
+		""",
+		{"doctype": doc.doctype},
+		as_dict=True,
+	)
+
+	i = frappe.get_meta(doc.doctype)
+	for s in specification_candidates:
+		if not s.apply_on:
+			applicable_specifications.append(s.name)
+		else:
+			fields = [h.fieldname for h in i.fields if h.options == s.dt]
+			if any([doc.get(field) == s.apply_on for field in fields]):
+				applicable_specifications.append(s.name)
+
+	return applicable_specifications
+
+
+"""
+Should return a union of existing specification values and specification attributes where values are not present
+
+"""
+
+
 @frappe.whitelist()
 def get_specification_values(reference_doctype, reference_name, specification=None):
-	# to create new specification values
-	if specification:
-		rows = []
-		specification_attributes = frappe.get_all(
-			"Specification Attribute",
-			{"parent": specification},
-			["attribute_name as attribute", "applied_on", "field"],
-		)
-		for attribute in specification_attributes:
-			value_string = ""
-			if attribute.field:
-				# dynamically get the field name of specification DocType
-				fieldname = frappe.get_value(
-					"DocField", {"parent": attribute.applied_on, "options": reference_doctype}, "fieldname"
-				)
-				# remove similar values using set
-				attribute_values = set(
-					frappe.get_all(attribute.applied_on, {fieldname: reference_name}, pluck=attribute.field)
-				)
-				for value in attribute_values:
-					# avoid None or 0 value
-					if value:
-						value_string += str(value) + ", "
-				value_string = value_string.strip(", ")
-			rows.append({"attribute": attribute.attribute, "field": attribute.field, "value": value_string})
-
-		# no results, probably setting up a new item
-		if not rows:
-			specification = frappe.get_doc("Specification", specification)
-			rows = [
-				{
-					"attribute": attribute.attribute_name,
-					"field": attribute.field,
-					"value": frappe.get_value(reference_doctype, reference_name, attribute.field)
-					if attribute.field
-					else None,
-				}
-				for attribute in specification.attributes
-			]
-		return rows
-
-	# to get existing specification value for each Item
-	r = frappe.get_all(
-		"Specification Value",
-		filters={"reference_doctype": reference_doctype, "reference_name": reference_name},
-		fields=["name AS row_name", "attribute", "value", "field", "specification"],
-		order_by="attribute ASC, value ASC",
-	)
-	for row in r:
-		date_values = frappe.get_value(
-			"Specification Attribute",
-			{"parent": row.specification, "attribute_name": row.attribute},
-			["date_values"],
-		)
-		if date_values:
-			row.value = convert_from_epoch(row.value)
-	return r
-
-
-@frappe.whitelist()
-def update_specification_values(spec, specifications, reference_doctype, reference_name):
-	if isinstance(specifications, str):
-		specifications = [frappe._dict(**s) for s in json.loads(specifications)]
-	# convert dates to epoch
-	existing_values = get_specification_values(reference_doctype, reference_name)
-	for s in specifications:
-		for row in existing_values:
-			if row.row_name and row.row_name == s.row_name and row.value != s.value:
-				date_values = frappe.get_value(
-					"Specification Attribute", {"parent": spec, "attribute_name": s.attribute}, ["date_values"]
-				)
-				if date_values:
-					s.value = convert_to_epoch(s.value)
-				frappe.set_value("Specification Value", s.row_name, "value", s.value)
-		if not s.row_name:
-			av = frappe.new_doc("Specification Value")
-			av.reference_doctype = reference_doctype
-			av.reference_name = reference_name
-			av.attribute = s.attribute
-			av.specification = spec
-			av.value = s.value
-			date_values = frappe.get_value(
-				"Specification Attribute", {"parent": spec, "attribute_name": s.attribute}, ["date_values"]
+	if not specification:
+		specs = get_applicable_specification(frappe.get_doc(reference_doctype, reference_name))
+		_r = []
+	else:
+		specs = [specification]
+	for s in specs:
+		spec = frappe.get_cached_doc("Specification", s)
+		for row in spec.attributes:
+			r = frappe.get_all(
+				"Specification Value",
+				filters={
+					"reference_doctype": reference_doctype,
+					"reference_name": reference_name,
+					"attribute": row.attribute_name,
+					"specification": spec.name,
+				},
+				fields=["name AS row_name", "attribute", "value", "field", "specification"],
+				order_by="attribute ASC, value ASC",
 			)
-			if date_values:
-				av.value = convert_to_epoch(av.value)
-			av.save()
+			if not r:
+				_r.append(
+					frappe._dict(
+						{
+							"row_name": None,
+							"attribute": row.attribute_name,
+							"value": None,
+							"field": row.field,
+							"specification": spec.name,
+						}
+					)
+				)
+			else:
+				[_r.append(i) for i in r]
+
+	return _r
 
 
 @frappe.whitelist()
@@ -324,7 +268,50 @@ def _create_specification_values(specification, attribute, value):
 			s.save()
 
 
-# readonly
+@frappe.whitelist()
+def update_specification_values(reference_doctype, reference_name, spec=None, specifications=None):
+	if isinstance(specifications, str):
+		specifications = json.loads(specifications)
+		specifications = [frappe._dict(**s) for s in specifications]
+	# convert dates to epoch
+	existing_values = get_specification_values(reference_doctype, reference_name)
+	# print('existing_values', reference_name)
+	# [print(existing_value) for existing_value in existing_values]
+	for s in specifications:
+		if not s.row_name and not s.value and not s.field:
+			continue
+		if existing_values:
+			for row in existing_values:
+				# print(row)
+				if row.row_name and row.row_name == s.row_name and row.value != s.value:
+					if not s.value:
+						frappe.delete_doc("Specification Value", row.row_name)
+						continue
+					date_values = frappe.get_value(
+						"Specification Attribute", {"parent": spec, "attribute_name": s.attribute}, ["date_values"]
+					)
+					if date_values:
+						s.value = convert_to_epoch(s.value)
+					frappe.set_value("Specification Value", s.row_name, "value", s.value)
+		if not s.row_name:
+			av = frappe.new_doc("Specification Value")
+			av.reference_doctype = reference_doctype
+			av.reference_name = reference_name
+			av.attribute = s.attribute
+			av.specification = s.specification
+			if s.field:
+				s.value = frappe.get_value(reference_doctype, reference_name, s.field)
+			av.value = s.value
+			# TODO:
+			date_values = frappe.get_value(
+				"Specification Attribute", {"parent": spec, "attribute_name": s.attribute}, ["date_values"]
+			)
+			if date_values:
+				av.value = convert_to_epoch(av.value)
+			if av.value:
+				av.save()
+
+
 @frappe.whitelist()
 def get_apply_on_fields(doctype):
 	Spec = DocType("Specification")
@@ -345,18 +332,16 @@ def get_apply_on_fields(doctype):
 # @frappe.readonly()
 @frappe.validate_and_sanitize_search_inputs
 def specification_query(doctype, txt, searchfield, start, page_len, filters):
-	meta = frappe.get_meta("Specification")
-	fieldnames = [f.fieldname for f in meta.fields]
-	for f in reversed(filters):
-		if f[0] in fieldnames:
-			continue
-		del f
+	_filters = {}
+	if filters.get("reference_doctype") != "Specification":
+		doc = frappe.get_doc(filters.get("reference_doctype"), filters.get("reference_name"))
+		_filters["name"] = ["in", get_applicable_specification(doc)]
 
 	search_fields = get_fields("Specification")
 	specifications = frappe.get_all(
 		"Specification",
+		filters=_filters,
 		fields=search_fields,
-		filters=filters,
 		limit_start=start,
 		limit_page_length=page_len,
 		as_list=1,

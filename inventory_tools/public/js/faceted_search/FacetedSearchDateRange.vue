@@ -3,7 +3,7 @@
 		<div>
 			<span class="min-max-inputs">
 				<input class="form-control form-input" type="date" v-model="minFilterValue" @change="change" />
-				&nbsp;
+				<br />
 				<input class="form-control form-input" type="date" v-model="maxFilterValue" @change="change" />
 			</span>
 		</div>
@@ -39,12 +39,15 @@ export default {
 <style scoped>
 .min-max-inputs {
 	display: flex;
+	flex-direction: column;
 	white-space: nowrap;
 }
 
 .min-max-inputs input {
 	width: 17ch;
 	text-align: right;
+	margin-right: 1ch;
+	margin-bottom: 0.5rem;
 }
 
 #slider-div {

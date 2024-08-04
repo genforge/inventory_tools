@@ -1,14 +1,13 @@
 <template>
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
-		<li class="sidebar-label" v-for="(comp, idx) in searchComponents" :key="idx">
-			<div class="pointer" @click="toggleFilters(idx)">
+		<li v-for="(comp, idx) in searchComponents" :key="idx">
+			<div class="faceted-search-attribute" @click="toggleFilters(idx)">
 				<B> {{ comp.attribute_name }} </B>
 				<svg class="icon icon-sm float-right">
 					<use href="#icon-small-down" v-show="!comp.visible"></use>
 					<use href="#icon-small-up" v-show="comp.visible"></use>
 				</svg>
 			</div>
-
 			<component
 				class="scrollable-filter"
 				:is="comp.component"
@@ -25,7 +24,7 @@
 <script>
 import { watchDebounced } from '@vueuse/core'
 
-frappe.provide('erpnext')
+frappe.provide('webshop')
 
 export default {
 	name: 'FacetedSearch',
@@ -70,6 +69,7 @@ export default {
 					headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
 				})
 				.then(r => {
+					console.log(r)
 					this.searchComponents = r.message
 					for (const value of Object.values(r.message)) {
 						this.updateFilters(value)
@@ -77,9 +77,9 @@ export default {
 				})
 		},
 		async setFilterValues() {
-			if (erpnext.e_commerce) {
+			if (webshop && window.cur_list == undefined) {
 				frappe
-					.xcall('erpnext.e_commerce.api.get_product_filter_data', {
+					.xcall('webshop.webshop.api.get_product_filter_data', {
 						query_args: { attributes: this.filterValues, sort_order: this.sortOrder },
 					})
 					.then(r => {
@@ -87,14 +87,14 @@ export default {
 						if (!r.items) {
 							return
 						} else if (view_type == 'List View') {
-							new erpnext.ProductList({
+							new webshop.ProductList({
 								items: r.items,
 								products_section: $('#products-list-area'),
 								settings: r.settings,
 								preference: view_type,
 							})
 						} else {
-							new erpnext.ProductGrid({
+							new webshop.ProductGrid({
 								items: r.items,
 								products_section: $('#products-grid-area'),
 								settings: r.settings,
@@ -102,11 +102,10 @@ export default {
 							})
 						}
 					})
-			} else {
+			} else if (window.cur_list != undefined) {
 				const items = await frappe.xcall('inventory_tools.inventory_tools.faceted_search.get_specification_items', {
 					attributes: this.filterValues,
 				})
-
 				const listview = frappe.get_list_view(this.doctype)
 				let filters = listview.filter_area.get()
 
@@ -170,16 +169,22 @@ export default {
 <style scoped>
 .faceted-search-box {
 	min-height: 25rem;
+	flex-direction: column;
+	flex-basis: 100%;
+	flex: 1;
 }
 
 .scrollable-filter {
 	max-height: 7rem;
 	overflow-y: auto;
 	margin-bottom: 1rem;
+	flex-direction: column;
+	flex-wrap: wrap;
+	width: 100%;
 }
 
-.pointer {
-	display: inline-block;
+.faceted-search-attribute {
+	flex-flow: row;
 	cursor: pointer;
 }
 

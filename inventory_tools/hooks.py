@@ -28,7 +28,6 @@ web_include_css = [
 	"/assets/inventory_tools/dist/js/style.css",
 ]
 web_include_js = [
-	"faceted_search.bundle.js",
 	"/assets/inventory_tools/dist/js/inventory_tools.js",
 ]
 

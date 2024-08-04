@@ -43,6 +43,7 @@ export default {
 .min-max-inputs input {
 	display: inline;
 	max-width: 10ch;
+	margin-right: 1ch;
 	text-align: right;
 }
 
