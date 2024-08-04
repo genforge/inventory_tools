@@ -118,7 +118,8 @@ def test_manual_attribute_addition():
 		_args = {
 			"reference_doctype": "Item",
 			"reference_name": item,
-			"specification": "Baked Goods",
+			"specification": "Items",
+
 		}
 		values = frappe.call(
 			"inventory_tools.inventory_tools.doctype.specification.specification.get_specification_values",
@@ -128,7 +129,7 @@ def test_manual_attribute_addition():
 			if isinstance(manual_values, list):
 				for v in manual_values:
 					values.append(
-						{"row_name": "", "attribute": attribute, "value": v, "specification": "Baked Goods"}
+						{"row_name": "", "attribute": attribute, "value": v, "specification": "Items"}
 					)
 			else:
 				values.append(
@@ -136,12 +137,12 @@ def test_manual_attribute_addition():
 						"row_name": "",
 						"attribute": attribute,
 						"value": manual_values,
-						"specification": "Baked Goods",
+						"specification": "Items",
 					}
 				)
 		# print(existing_values)
 		args = {
-			"spec": "Baked Goods",
+			"spec": "Items",
 			"specifications": frappe.as_json(values),
 			"reference_doctype": "Item",
 			"reference_name": item,
@@ -152,7 +153,7 @@ def test_manual_attribute_addition():
 		)
 	assert (
 		len(
-			frappe.get_all("Specification Value", {"specification": "Baked Goods", "attribute": "Color"})
+			frappe.get_all("Specification Value", {"specification": "Items", "attribute": "Color"})
 		)
 		== 25
 	)  # all colors in baked goods items from fixtures
@@ -164,14 +165,15 @@ def test_delete_of_specification_value():
 	_args = {
 		"reference_doctype": "Item",
 		"reference_name": "Ambrosia Pie",
-		"specification": "Baked Goods",
+		"specification": "Items",
 	}
 	values = frappe.call(
 		"inventory_tools.inventory_tools.doctype.specification.specification.get_specification_values",
 		**_args
 	)
-	assert "Blue" in [v.value for v in values if v.attribute == "Color"]
-	assert len(values) == 11
+	colors = [v.value for v in values if v.attribute == "Color"]
+	assert "Blue" in colors
+	assert len(colors) == 2
 
 	for v in values:
 		if v.attribute == "Color" and v.value == "Blue":
@@ -192,7 +194,7 @@ def test_delete_of_specification_value():
 			frappe.get_all(
 				"Specification Value",
 				{
-					"specification": "Baked Goods",
+					"specification": "Items",
 					"attribute": "Color",
 					"reference_name": _args.get("reference_name"),
 				},

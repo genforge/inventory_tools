@@ -826,6 +826,10 @@ def create_specifications(settings=None):
 
 
 def create_demo_specification_values():
+	"""
+	run this if you need to manually create data for demoing faceted search
+	bench execute 'inventory_tools.tests.setup.create_demo_specification_values'
+	"""
 	from inventory_tools.tests.test_faceted_search import (
 		test_values_updated_on_item_save,
 		test_generate_values,

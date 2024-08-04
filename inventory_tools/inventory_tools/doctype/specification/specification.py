@@ -175,9 +175,9 @@ Should return a union of existing specification values and specification attribu
 
 @frappe.whitelist()
 def get_specification_values(reference_doctype, reference_name, specification=None):
+	_r = []
 	if not specification:
 		specs = get_applicable_specification(frappe.get_doc(reference_doctype, reference_name))
-		_r = []
 	else:
 		specs = [specification]
 	for s in specs:
