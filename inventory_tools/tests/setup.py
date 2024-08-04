@@ -803,7 +803,7 @@ def create_specifications(settings=None):
 		("Green", "#8CCF54"),
 		("Yellow", "#FFFF00"),
 		("White", "#EEEEEE"),
-		("Black", "#1111111"),
+		("Black", "#111111"),
 	):
 		if not frappe.db.exists("Color", c[0]):
 			color = frappe.new_doc("Color")

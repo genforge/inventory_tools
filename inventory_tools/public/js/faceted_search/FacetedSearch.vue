@@ -55,7 +55,6 @@ export default {
 			watchDebounced(
 				this.filterValues,
 				async (value, oldValue) => {
-					console.log('changed!')
 					await this.setFilterValues()
 				},
 				{ debounce: 500, maxWait: 1000 }
