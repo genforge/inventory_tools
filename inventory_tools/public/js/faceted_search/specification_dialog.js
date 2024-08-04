@@ -58,14 +58,11 @@ inventory_tools.specification_dialog = async frm => {
 					options: 'Specification',
 					read_only: frm.doc.doctype == 'Specification' ? 1 : 0,
 					default: frm.doc.doctype == 'Specification' ? frm.doc.name : '',
-					on_change: async () => {
+					onchange: async () => {
 						values = d.get_values()
-						if (values && values.specification && is_new) {
+						if (values) {
 							let _data = await get_specification_values(frm, values.specification)
 							if (_data.length) {
-								if (!d.fields_dict.specification.value) {
-									d.set_value('specification', _data[0].specification)
-								}
 								d.fields_dict.specs.grid.df.data = []
 								data = _data
 								d.fields_dict.specs.grid.docfields[0].options = get_attributes(data)
