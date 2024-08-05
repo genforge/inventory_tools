@@ -2,24 +2,17 @@
 # For license information, please see license.txt
 
 import datetime
-import types
-from itertools import groupby
 
 import frappe
-from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
-from frappe.utils.data import add_months, flt, getdate, nowdate, get_datetime
-
-from erpnext.accounts.doctype.account.account import update_account_number
 from erpnext.manufacturing.doctype.production_plan.production_plan import (
 	get_items_for_material_requests,
 )
-from erpnext.setup.utils import enable_all_roles_and_domains, set_defaults_for_tests
-from erpnext.stock.get_item_details import get_item_details
-
+from erpnext.setup.utils import set_defaults_for_tests
+from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+from frappe.utils.data import add_months, flt, getdate, nowdate, get_datetime
 from webshop.webshop.doctype.website_item.website_item import make_website_item
 
 from inventory_tools.tests.fixtures import (
-	attributes,
 	boms,
 	customers,
 	items,

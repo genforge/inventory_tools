@@ -4,14 +4,13 @@
 import datetime
 import json
 import time
-from pytz import timezone
-from dateutil.relativedelta import relativedelta
+from pytz import UnknownTimeZoneError, timezone
 
 import frappe
 from frappe.core.doctype.doctype.doctype import no_value_fields, table_fields
 from frappe.model.document import Document
 from frappe.query_builder import DocType
-from frappe.utils.data import flt, get_datetime, getdate
+from frappe.utils.data import flt, get_datetime
 
 from erpnext.controllers.queries import get_fields
 
@@ -111,15 +110,23 @@ class Specification(Document):
 
 
 def convert_to_epoch(date):
-	system_settings = frappe.get_cached_doc("System Settings", "System Settings")
-	d = datetime.datetime.now(
-		timezone(time.tzname if isinstance(time.tzname, (int, str)) else time.tzname[0])
-	)  # or some other local date )
-	utc_offset = d.utcoffset().total_seconds()
-	return (
-		(get_datetime(date) - datetime.timedelta(hours=12, seconds=int(utc_offset)))
-		- get_datetime("1970-1-1")
-	).total_seconds()
+	tzname = time.tzname if isinstance(time.tzname, (int, str)) else time.tzname[0]
+
+	try:
+		tz = timezone(tzname)
+	except UnknownTimeZoneError:
+		# default to beginning of epoch
+		return
+
+	d = datetime.datetime.now(tz)  # or some other local date
+	utc_offset = d.utcoffset()
+	if utc_offset:
+		utc_offset_seconds = utc_offset.total_seconds()
+		offset_d = (
+			get_datetime(date) - datetime.timedelta(hours=12, seconds=int(utc_offset_seconds))
+		) - get_datetime("1970-01-01")
+		return offset_d.total_seconds()
+	return
 
 
 def convert_from_epoch(date):
