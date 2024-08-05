@@ -132,6 +132,7 @@ override_doctype_class = {
 	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
 	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
 	"Workstation": "inventory_tools.inventory_tools.overrides.workstation.InventoryToolsWorkstation",
+	"Website Item": "inventory_tools.inventory_tools.overrides.website_item.InventoryToolsWebsiteItem",
 }
 
 
@@ -199,7 +200,7 @@ doc_events = {
 override_whitelisted_methods = {
 	"erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry": "inventory_tools.inventory_tools.overrides.work_order.make_stock_entry",
 	"erpnext.stock.get_item_details.get_item_details": "inventory_tools.inventory_tools.overrides.purchase_order.get_item_details",
-	"erpnext.e_commerce.api.get_product_filter_data": "inventory_tools.inventory_tools.faceted_search.get_product_filter_data",
+	"webshop.webshop.api.get_product_filter_data": "inventory_tools.inventory_tools.faceted_search.get_product_filter_data",
 }
 
 

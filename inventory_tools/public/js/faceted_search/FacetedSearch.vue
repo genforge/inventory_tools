@@ -84,6 +84,7 @@ const updateFilters = (values: FilterValue) => {
 }
 
 const loadFacets = async () => {
+	const params = new URLSearchParams(window.location.search)
 	const { message }: { message: SearchComponent[] } = await frappe.call({
 		method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
 		args: { doctype: props.doctype, filters: filterValues.value },
@@ -91,8 +92,16 @@ const loadFacets = async () => {
 	})
 
 	searchComponents.value = message
-	for (const value of Object.values(message)) {
-		updateFilters(value)
+	for (const [key, value] of Object.entries(message)) {
+		filterValues[key.value] = []
+		if (value.attribute_name in Object.fromEntries(params)) {
+			updateFilters({
+				attribute_name: value.attribute_name,
+				attribute_id: value.attribute_id,
+				values: [params.get(value.attribute_name)],
+			})
+			params.delete(value.attribute_name)
+		}
 	}
 }
 
