@@ -68,7 +68,6 @@ export default {
 					headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
 				})
 				.then(r => {
-					console.log(r)
 					this.searchComponents = r.message
 					for (const value of Object.values(r.message)) {
 						this.updateFilters(value)

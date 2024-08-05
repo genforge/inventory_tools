@@ -20,7 +20,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.34.0
+    rev: v3.17.0
     hooks:
       - id: pyupgrade
         args: ['--py310-plus']
@@ -31,7 +31,7 @@ repos:
       - id: black
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 7.1.1
     hooks:
       - id: flake8
         additional_dependencies: ['flake8-bugbear']

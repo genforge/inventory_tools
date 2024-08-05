@@ -12,6 +12,13 @@ from frappe.utils.data import cint, flt, getdate
 
 from inventory_tools.inventory_tools.doctype.specification.specification import convert_to_epoch
 
+SORT_ORDER_LOOKUP = {
+	"Title A-Z": "item_name ASC, ranking DESC",
+	"Title Z-A": "item_name DESC, ranking DESC",
+	"Item Code A-Z": "item_code ASC, ranking DESC",
+	"Item Code Z-A": "item_code DESC, ranking DESC",
+}
+
 
 @frappe.whitelist(allow_guest=True)
 def show_faceted_search_components(doctype="Item", filters=None):
@@ -69,14 +76,6 @@ def show_faceted_search_components(doctype="Item", filters=None):
 	return components
 
 
-sort_order_lookup = {
-	"Title A-Z": "item_name ASC, ranking DESC",
-	"Title Z-A": "item_name DESC, ranking DESC",
-	"Item Code A-Z": "item_code ASC, ranking DESC",
-	"Item Code Z-A": "item_code DESC, ranking DESC",
-}
-
-
 class FacetedSearchQuery(ProductQuery):
 	def query(
 		self, attributes=None, fields=None, search_term=None, start=0, item_group=None, sort_order=""
@@ -94,7 +93,7 @@ class FacetedSearchQuery(ProductQuery):
 		if self.settings.hide_variants:
 			self.filters.append(["variant_of", "is", "not set"])
 
-		sort_order = sort_order_lookup.get(sort_order) if sort_order else "item_name ASC"
+		sort_order = SORT_ORDER_LOOKUP.get(sort_order) if sort_order else "item_name ASC"
 
 		# query results
 		if attributes:
@@ -223,15 +222,12 @@ def get_product_filter_data(query_args=None):
 
 @frappe.whitelist()
 def update_specification_attribute_values(doc, method=None):
-	specifications = list(
-		set(
-			frappe.get_all(
-				"Specification Attribute",
-				fields=["parent"],
-				filters={"applied_on": doc.doctype},
-				pluck="parent",
-			)
-		)
+	specifications = frappe.get_all(
+		"Specification Attribute",
+		fields=["parent"],
+		filters={"applied_on": doc.doctype},
+		pluck="parent",
+		distinct=True,
 	)
 	if not specifications:
 		return

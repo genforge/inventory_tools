@@ -2,8 +2,7 @@
 // For license information, please see license.txt
 
 frappe.listview_settings['Specification Value'] = {
-	refresh: listview => {
-		console.log('this', listview)
-	},
+	// refresh: function(frm) {
+	// }
 	hide_name_column: true,
 }
