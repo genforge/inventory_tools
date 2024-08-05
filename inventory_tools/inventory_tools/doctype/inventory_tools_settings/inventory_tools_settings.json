@@ -27,10 +27,10 @@
 		"update_warehouse_path",
 		"column_break_ddssn",
 		"allow_alternative_workstations",
-		"section_break_gzcbr",
 		"uoms_section",
 		"enforce_uoms",
 		"faceted_search_tab",
+		"section_break_pxnx",
 		"show_on_website",
 		"show_in_listview"
 	],
@@ -91,11 +91,6 @@
 			"fieldname": "update_warehouse_path",
 			"fieldtype": "Check",
 			"label": "Update Warehouse Path"
-		},
-		{
-			"fieldname": "section_break_gzcbr",
-			"fieldtype": "Section Break",
-			"label": "Warehouses"
 		},
 		{
 			"fieldname": "uoms_section",
@@ -178,11 +173,16 @@
 			"fieldname": "allow_alternative_workstations",
 			"fieldtype": "Check",
 			"label": "Allow Alternative Workstations"
+		},
+		{
+			"description": "These settings will apply to all companies",
+			"fieldname": "section_break_pxnx",
+			"fieldtype": "Section Break"
 		}
 	],
 	"index_web_pages_for_search": 1,
 	"links": [],
-	"modified": "2024-04-12 10:02:32.688310",
+	"modified": "2024-08-05 10:12:40.728422",
 	"modified_by": "Administrator",
 	"module": "Inventory Tools",
 	"name": "Inventory Tools Settings",

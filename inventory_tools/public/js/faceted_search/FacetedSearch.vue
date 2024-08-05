@@ -127,7 +127,7 @@ const setFilterValues = async () => {
 		const items = await frappe.xcall('inventory_tools.inventory_tools.faceted_search.get_specification_items', {
 			attributes: filterValues.value,
 		})
-		const listview = frappe.get_list_view(props.doctype)
+		const listview = frappe.get_list_view(props.doctype) || 'Item'
 		let filters: ListviewFilter = listview.filter_area.get()
 
 		for (const [key, value] of Object.entries(filterValues.value)) {

@@ -199,6 +199,8 @@ def setup_manufacturing_settings(settings):
 	frappe.set_value(
 		"Inventory Tools Settings", settings.company, "overproduction_percentage_for_work_order", 50
 	)
+	frappe.set_value("Inventory Tools Settings", settings.company, "show_on_website", 1)
+	frappe.set_value("Inventory Tools Settings", settings.company, "show_in_listview", 1)
 
 
 def create_workstations():
