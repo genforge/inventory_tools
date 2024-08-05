@@ -9,33 +9,38 @@
 		</div>
 	</div>
 </template>
-<script>
-export default {
-	name: 'FacetedSearchDateRange',
-	props: ['values', 'attribute_name', 'attribute_id'],
-	data() {
-		return {
-			minFilterValue: 0,
-			maxFilterValue: 0,
-		}
-	},
-	methods: {
-		change() {
-			this.$emit('update_filters', {
-				attribute_name: this.attribute_name,
-				attribute_id: this.attribute_id,
-				values: [this.minFilterValue, this.maxFilterValue],
-			})
-		},
-	},
-	mounted() {
-		if (this.values) {
-			this.minFilterValue = moment(this.values[0] * 1000).format('YYYY-MM-DD')
-			this.maxFilterValue = moment(this.values[1] * 1000).format('YYYY-MM-DD')
-		}
-	},
+
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+
+declare const moment: any
+
+const emit = defineEmits(['update_filters'])
+const props = defineProps<{
+	values: any[]
+	attribute_name: string
+	attribute_id: string
+}>()
+
+const minFilterValue = ref(0)
+const maxFilterValue = ref(0)
+
+onMounted(() => {
+	if (props.values) {
+		minFilterValue.value = moment(props.values[0] * 1000).format('YYYY-MM-DD')
+		maxFilterValue.value = moment(props.values[1] * 1000).format('YYYY-MM-DD')
+	}
+})
+
+const change = () => {
+	emit('update_filters', {
+		attribute_name: props.attribute_name,
+		attribute_id: props.attribute_id,
+		values: [minFilterValue.value, maxFilterValue.value],
+	})
 }
 </script>
+
 <style scoped>
 .min-max-inputs {
 	display: flex;

@@ -17,7 +17,7 @@ faceted_search.mount = el => {
 	faceted_search.$search.component('FacetedSearchNumericRange', FacetedSearchNumericRange)
 	faceted_search.$search.component('FacetedSearchDateRange', FacetedSearchDateRange)
 	faceted_search.$search.component('FacetedSearchColorPicker', FacetedSearchColorPicker)
-	faceted_search.$search.mount(el)
+	faceted_search.$instance = faceted_search.$search.mount(el)
 }
 
 function waitForElement(selector) {
@@ -75,7 +75,7 @@ waitForElement('#product-filters').then(element => {
 				</select>`
 			)
 			el.on('change', e => {
-				faceted_search.$search.$children[0].updateFilters({ sort_order: e.target.value })
+				faceted_search.$instance.updateFilters({ sort_order: e.target.value })
 			})
 		})
 	})
