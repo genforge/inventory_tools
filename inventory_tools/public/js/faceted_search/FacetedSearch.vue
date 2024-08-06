@@ -11,6 +11,7 @@
 			<component
 				v-show="component.visible"
 				class="scrollable-filter"
+				:key="componentKey"
 				:is="component.component"
 				:attribute_id="component.attribute_id"
 				:attribute_name="component.attribute_name"
@@ -49,8 +50,9 @@ const props = withDefaults(
 	}
 )
 
-const searchComponents = ref<SearchComponents>({})
+const componentKey = ref(0)
 const filterValues = ref<{ [key: string]: Partial<FilterValue> }>({})
+const searchComponents = ref<SearchComponents>({})
 const sortOrder = ref('')
 
 onMounted(async () => {
@@ -69,6 +71,12 @@ const toggleFilters = (key: string | number) => {
 	searchComponents.value[key].visible = !searchComponents.value[key].visible
 }
 
+const resetFacets = async () => {
+	filterValues.value = {}
+	await loadFacets()
+	componentKey.value++
+}
+
 const updateFilters = async (values: FilterValue) => {
 	if (values.sort_order) {
 		sortOrder.value = values.sort_order
@@ -79,7 +87,7 @@ const updateFilters = async (values: FilterValue) => {
 		}
 	}
 
-	await setFilterValues()
+	await setFilters()
 }
 
 const loadFacets = async () => {
@@ -104,7 +112,7 @@ const loadFacets = async () => {
 	}
 }
 
-const setFilterValues = async () => {
+const setFilters = async () => {
 	if (!Object.keys(filterValues.value).length) {
 		refreshListFilters([])
 		return
@@ -208,7 +216,7 @@ const refreshListFilters = (filters: ListFilters) => {
 	listview.refresh()
 }
 
-defineExpose({ updateFilters })
+defineExpose({ resetFacets, updateFilters })
 </script>
 
 <style scoped>

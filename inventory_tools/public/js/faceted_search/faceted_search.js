@@ -63,6 +63,12 @@ waitForElement('[data-route]').then(element => {
 	observer.observe(element, config)
 })
 
+waitForElement('.filter-x-button').then(element => {
+	cur_list.filter_area.filter_x_button.on('click', () => {
+		faceted_search.$instance.resetFacets()
+	})
+})
+
 waitForElement('#product-filters').then(element => {
 	frappe.ready(() => {
 		frappe
