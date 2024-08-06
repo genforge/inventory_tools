@@ -31,6 +31,7 @@ app_include_js = ["inventory_tools.bundle.js"]
 
 # include js in doctype views
 doctype_js = {
+	"Item": "public/js/custom/item.js",
 	"Job Card": "public/js/custom/job_card_custom.js",
 	"Purchase Invoice": "public/js/custom/purchase_invoice_custom.js",
 	"Purchase Order": "public/js/custom/purchase_order_custom.js",
