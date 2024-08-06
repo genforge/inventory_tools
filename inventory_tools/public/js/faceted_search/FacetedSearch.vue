@@ -1,32 +1,31 @@
 <template>
 	<ul class="list-unstyled sidebar-menu faceted-search-box">
-		<li v-for="(comp, idx) in searchComponents" :key="idx">
-			<div class="faceted-search-attribute" @click="toggleFilters(idx)">
-				<B> {{ comp.attribute_name }} </B>
+		<li v-for="(component, key) in searchComponents" :key="key">
+			<div class="faceted-search-attribute" @click="toggleFilters(key)">
+				<B> {{ component.attribute_name }} </B>
 				<svg class="icon icon-sm float-right">
-					<use href="#icon-small-down" v-show="!comp.visible"></use>
-					<use href="#icon-small-up" v-show="comp.visible"></use>
+					<use href="#icon-small-down" v-show="!component.visible"></use>
+					<use href="#icon-small-up" v-show="component.visible"></use>
 				</svg>
 			</div>
 			<component
-				v-show="comp.visible"
+				v-show="component.visible"
 				class="scrollable-filter"
-				:is="comp.component"
-				:values="comp.values"
-				:attribute_name="comp.attribute_name"
-				:attribute_id="comp.attribute_id"
-				@update_filters="updateFilters"></component>
+				:is="component.component"
+				:attribute_id="component.attribute_id"
+				:attribute_name="component.attribute_name"
+				:values="component.values"
+				@update_filters="updateFilters" />
 			<hr />
 		</li>
 	</ul>
 </template>
 
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
-export type ListviewFilter = [string, string, string, any] | [string, string, string, any, boolean] | any[]
-export type SearchComponent = FilterValue | { [key: string]: FilterValue }
+export type ListFilters = [string, string, string, any] | [string, string, string, any, boolean] | any[]
+export type SearchComponents = { [key: string]: FilterValue }
 export type FilterValue = {
 	attribute_id: string
 	attribute_name: string
@@ -50,21 +49,27 @@ const props = withDefaults(
 	}
 )
 
-const searchComponents = ref<SearchComponent[]>([])
-const filterValues = ref<{
-	[key: string]: Partial<FilterValue>
-}>({})
+const searchComponents = ref<SearchComponents>({})
+const filterValues = ref<{ [key: string]: Partial<FilterValue> }>({})
 const sortOrder = ref('')
 
 onMounted(async () => {
 	await loadFacets()
 })
 
-const toggleFilters = (idx: number) => {
-	searchComponents.value[idx].visible = !searchComponents.value[idx].visible
+const isFiltered = computed(() => {
+	let isFiltered = false
+	for (const value of Object.values(filterValues.value)) {
+		isFiltered = isFiltered || Boolean(Object.keys(value).length && value.values?.length)
+	}
+	return isFiltered
+})
+
+const toggleFilters = (key: string | number) => {
+	searchComponents.value[key].visible = !searchComponents.value[key].visible
 }
 
-const updateFilters = (values: FilterValue) => {
+const updateFilters = async (values: FilterValue) => {
 	if (values.sort_order) {
 		sortOrder.value = values.sort_order
 	} else {
@@ -74,18 +79,12 @@ const updateFilters = (values: FilterValue) => {
 		}
 	}
 
-	watchDebounced(
-		filterValues.value,
-		async (value, oldValue) => {
-			await setFilterValues()
-		},
-		{ debounce: 500, maxWait: 1000 }
-	)
+	await setFilterValues()
 }
 
 const loadFacets = async () => {
 	const params = new URLSearchParams(window.location.search)
-	const { message }: { message: SearchComponent[] } = await frappe.call({
+	const { message }: { message: SearchComponents } = await frappe.call({
 		method: 'inventory_tools.inventory_tools.faceted_search.show_faceted_search_components',
 		args: { doctype: props.doctype, filters: filterValues.value },
 		headers: { 'X-Frappe-CSRF-Token': frappe.csrf_token },
@@ -93,7 +92,7 @@ const loadFacets = async () => {
 
 	searchComponents.value = message
 	for (const [key, value] of Object.entries(message)) {
-		filterValues[key.value] = []
+		filterValues.value[key] = {}
 		if (value.attribute_name in Object.fromEntries(params)) {
 			updateFilters({
 				attribute_name: value.attribute_name,
@@ -106,6 +105,11 @@ const loadFacets = async () => {
 }
 
 const setFilterValues = async () => {
+	if (!Object.keys(filterValues.value).length) {
+		refreshListFilters([])
+		return
+	}
+
 	if (webshop && window.cur_list === undefined) {
 		const response = await frappe.xcall('webshop.webshop.api.get_product_filter_data', {
 			query_args: {
@@ -136,8 +140,8 @@ const setFilterValues = async () => {
 		const items = await frappe.xcall('inventory_tools.inventory_tools.faceted_search.get_specification_items', {
 			attributes: filterValues.value,
 		})
-		const listview = frappe.get_list_view(props.doctype) || 'Item'
-		let filters: ListviewFilter = listview.filter_area.get()
+		const listview = frappe.get_list_view(props.doctype || 'Item')
+		let filters: ListFilters = listview.filter_area.get()
 
 		for (const [key, value] of Object.entries(filterValues.value)) {
 			const values = value.values
@@ -147,7 +151,12 @@ const setFilterValues = async () => {
 				if (Array.isArray(values)) {
 					if (values.length > 0) {
 						if (!values[0] && !values[1]) {
-							// TODO: handle case where numeric range is unset
+							if (!isFiltered.value) {
+								refreshListFilters([])
+							} else {
+								// TODO: handle case where attribute is unchecked
+								// TODO: handle case where numeric range is unset
+							}
 						} else {
 							filters.push([props.doctype, attribute.field, 'in', values])
 						}
@@ -155,14 +164,19 @@ const setFilterValues = async () => {
 						filters = filters.filter(filter => filter[1] !== attribute.field)
 					}
 
-					refreshFilters(filters)
+					refreshListFilters(filters)
 				} else {
 					// TODO: handle edge-case?
 				}
 			} else {
 				if (Array.isArray(values)) {
 					if (!values[0] && !values[1]) {
-						// TODO: handle case where numeric range is unset
+						if (!isFiltered.value) {
+							refreshListFilters([])
+						} else {
+							// TODO: handle case where attribute is unchecked
+							// TODO: handle case where numeric range is unset
+						}
 					} else {
 						const existing_name_filter = filters.filter(filter => filter[1] === 'name')
 						if (existing_name_filter.length > 0) {
@@ -177,7 +191,7 @@ const setFilterValues = async () => {
 							filters.push([props.doctype, 'name', 'in', items])
 						}
 
-						refreshFilters(filters)
+						refreshListFilters(filters)
 					}
 				} else {
 					// TODO: handle edge-case?
@@ -187,7 +201,7 @@ const setFilterValues = async () => {
 	}
 }
 
-const refreshFilters = (filters: ListviewFilter) => {
+const refreshListFilters = (filters: ListFilters) => {
 	const listview = frappe.get_list_view(props.doctype)
 	listview.filter_area.clear(false)
 	listview.filter_area.set(filters)

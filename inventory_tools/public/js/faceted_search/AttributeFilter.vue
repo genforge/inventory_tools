@@ -31,7 +31,7 @@ const change = () => {
 	emit('update_filters', {
 		attribute_name: props.attribute_name,
 		attribute_id: props.attribute_id,
-		values: selectedValues.value.map(r => (r.isChecked ? r.attribute : null)).filter(r => r != null),
+		values: selectedValues.value.map(r => (r.isChecked ? r.attribute : null)).filter(r => r !== null),
 	})
 }
 </script>
