@@ -15,14 +15,6 @@ from inventory_tools.inventory_tools.doctype.specification.specification import 
 from inventory_tools.inventory_tools.faceted_search_query import FacetedSearchQuery
 
 
-SORT_ORDER_LOOKUP = {
-	"Title A-Z": "item_name ASC, ranking DESC",
-	"Title Z-A": "item_name DESC, ranking DESC",
-	"Item Code A-Z": "item_code ASC, ranking DESC",
-	"Item Code Z-A": "item_code DESC, ranking DESC",
-}
-
-
 @frappe.whitelist(allow_guest=True)
 def show_faceted_search_components(doctype="Item", filters=None):
 	attributes = frappe.get_all(
@@ -94,9 +86,7 @@ def get_product_filter_data(query_args=None):
 		search = query_args.get("search")
 		field_filters = query_args.get("field_filters", {})
 		attribute_filters = query_args.get("attributes", {})
-		sort_order = (
-			query_args.get("sort_order").get("sort_order") if query_args.get("sort_order") else ""
-		)
+		sort_order = query_args.get("sort_order") if query_args.get("sort_order") else ""
 		start = cint(query_args.start) if query_args.get("start") else 0
 		item_group = query_args.get("item_group")
 		from_filters = query_args.get("from_filters")

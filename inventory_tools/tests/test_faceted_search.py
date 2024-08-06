@@ -26,27 +26,27 @@ def test_values_updated_on_item_save():
 	values = frappe.get_all(
 		"Specification Value", {"reference_doctype": "Item", "reference_name": "Double Plum Pie"}
 	)
-	# assert values == []
+	assert values == []
 	doc = frappe.get_doc("Item", "Double Plum Pie")
 	doc.save()
 	values = frappe.get_all(
 		"Specification Value", {"reference_doctype": "Item", "reference_name": "Double Plum Pie"}
 	)
-	# assert len(values) == 4
+	assert len(values) == 4
 	doc.weight_per_unit = 12
 	doc.save()
 	values = frappe.get_all(
 		"Specification Value",
 		{"reference_doctype": "Item", "reference_name": "Double Plum Pie"},
 	)
-	# assert len(values) == 4
+	assert len(values) == 4
 	new_weight = frappe.get_all(
 		"Specification Value",
 		{"reference_doctype": "Item", "reference_name": "Double Plum Pie", "attribute": "Weight"},
 		"value",
 	)
-	# assert len(new_weight) == 1
-	# assert int(new_weight[0].value) == 12
+	assert len(new_weight) == 1
+	assert int(new_weight[0].value) == 12
 	doc.weight_per_unit = 8
 	doc.save()
 	new_weight = frappe.get_all(
@@ -54,12 +54,12 @@ def test_values_updated_on_item_save():
 		{"reference_doctype": "Item", "reference_name": "Double Plum Pie", "attribute": "Weight"},
 		"value",
 	)
-	# assert len(new_weight) == 1
-	# assert int(new_weight[0].value) == 8
+	assert len(new_weight) == 1
+	assert int(new_weight[0].value) == 8
 	values = frappe.get_all(
 		"Specification Value", {"reference_doctype": "Item", "reference_name": "Double Plum Pie"}
 	)
-	# assert len(values) == 4
+	assert len(values) == 4
 	# cleanup
 	for value in values:
 		frappe.delete_doc("Specification Value", value.name, force=True)
@@ -69,7 +69,7 @@ def test_values_updated_on_item_save():
 def test_generate_values():
 	frappe.flags.in_test = True
 	doc = frappe.get_doc("Specification", "Items")
-	# assert len(doc.attributes) == 3
+	assert len(doc.attributes) == 3
 	frappe.call(
 		"inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values",
 		**{
@@ -83,17 +83,17 @@ def test_generate_values():
 			],
 		}
 	)
-	# assert (
-	# 	len(frappe.get_all("Specification Value", {"specification": doc.name})) == 36 * 2
-	# )  # total items x computed attributes
+	assert (
+		len(frappe.get_all("Specification Value", {"specification": doc.name})) == 36 * 2
+	)  # total items x computed attributes
 
 
 @pytest.mark.order(72)
 def test_generate_values_on_overlapping_items():
 	frappe.flags.in_test = True
 	doc = frappe.get_doc("Specification", "Baked Goods")
-	# assert len(doc.attributes) == 4
-	# assert len(frappe.get_all("Specification Value", {"specification": doc.name})) == 0
+	assert len(doc.attributes) == 4
+	assert len(frappe.get_all("Specification Value", {"specification": doc.name})) == 0
 	frappe.call(
 		"inventory_tools.inventory_tools.doctype.specification.specification.create_specification_values",
 		**{
@@ -107,9 +107,9 @@ def test_generate_values_on_overlapping_items():
 			],
 		}
 	)
-	# assert (
-	# 	len(frappe.get_all("Specification Value", {"specification": doc.name})) == 6 * 2
-	# )  # total items x computed attributes
+	assert (
+		len(frappe.get_all("Specification Value", {"specification": doc.name})) == 6 * 2
+	)  # total items x computed attributes
 
 
 @pytest.mark.order(73)
@@ -148,10 +148,10 @@ def test_manual_attribute_addition():
 			"inventory_tools.inventory_tools.doctype.specification.specification.update_specification_values",
 			**args
 		)
-	# assert (
-	# 	len(frappe.get_all("Specification Value", {"specification": "Items", "attribute": "Color"}))
-	# 	== 25
-	# )  # all colors in baked goods items from fixtures
+	assert (
+		len(frappe.get_all("Specification Value", {"specification": "Items", "attribute": "Color"}))
+		== 25
+	)  # all colors in baked goods items from fixtures
 
 
 @pytest.mark.order(74)
@@ -167,8 +167,8 @@ def test_delete_of_specification_value():
 		**_args
 	)
 	colors = [v.value for v in values if v.attribute == "Color"]
-	# assert "Blue" in colors
-	# assert len(colors) == 2
+	assert "Blue" in colors
+	assert len(colors) == 2
 
 	for v in values:
 		if v.attribute == "Color" and v.value == "Blue":
@@ -184,16 +184,16 @@ def test_delete_of_specification_value():
 		"inventory_tools.inventory_tools.doctype.specification.specification.update_specification_values",
 		**args
 	)
-	# assert (
-	# 	len(
-	# 		frappe.get_all(
-	# 			"Specification Value",
-	# 			{
-	# 				"specification": "Items",
-	# 				"attribute": "Color",
-	# 				"reference_name": _args.get("reference_name"),
-	# 			},
-	# 		)
-	# 	)
-	# 	== 1
-	# )  # all colors in baked goods items from fixtures
+	assert (
+		len(
+			frappe.get_all(
+				"Specification Value",
+				{
+					"specification": "Items",
+					"attribute": "Color",
+					"reference_name": _args.get("reference_name"),
+				},
+			)
+		)
+		== 1
+	)  # all colors in baked goods items from fixtures

@@ -2,29 +2,35 @@
 # For license information, please see license.txt
 
 import json
-from time import localtime
 
 import frappe
-from frappe.utils.data import flt, getdate, fmt_money
-
+from erpnext.accounts.doctype.pricing_rule.pricing_rule import get_pricing_rule_for_item
 from erpnext.stock.get_item_details import get_conversion_factor
 from webshop.webshop.api import *
 from webshop.webshop.doctype.webshop_settings.webshop_settings import (
 	get_shopping_cart_settings,
 	show_quantity_in_website,
 )
-from webshop.webshop.shopping_cart.cart import _get_cart_quotation, _set_price_list
+from webshop.webshop.doctype.override_doctype.item_group import get_item_for_list_in_html
 from webshop.webshop.doctype.item_review.item_review import get_customer
 from webshop.webshop.product_data_engine.query import ProductQuery
-from erpnext.accounts.doctype.pricing_rule.pricing_rule import get_pricing_rule_for_item
+from webshop.webshop.shopping_cart.cart import _get_cart_quotation, _set_price_list, get_party
 from webshop.webshop.utils.product import (
 	get_non_stock_item_status,
 	adjust_qty_for_expired_items,
 )
+from frappe.utils.data import cint, flt, getdate, fmt_money
 
 from inventory_tools.inventory_tools.doctype.specification.specification import (
 	convert_to_epoch,
 )
+
+SORT_ORDER_LOOKUP = {
+	"Title A-Z": "item_name ASC, ranking DESC",
+	"Title Z-A": "item_name DESC, ranking DESC",
+	"Item Code A-Z": "item_code ASC, ranking DESC",
+	"Item Code Z-A": "item_code DESC, ranking DESC",
+}
 
 
 class FacetedSearchQuery(ProductQuery):
@@ -50,7 +56,7 @@ class FacetedSearchQuery(ProductQuery):
 		if self.settings.hide_variants:
 			self.filters.append(["variant_of", "is", "not set"])
 
-		sort_order = sort_order_lookup.get(sort_order) if sort_order else "item_name ASC"
+		sort_order = SORT_ORDER_LOOKUP.get(sort_order) if sort_order else "item_name ASC"
 
 		# query results
 		if attributes:
@@ -332,8 +338,6 @@ def get_product_list(search=None, start=0, limit=12):
 
 
 def _get_price(item_code, price_list, customer_group, company, qty=1, uom=None):
-	from erpnext.e_commerce.shopping_cart.cart import get_party
-
 	template_item_code = frappe.db.get_value("Item", item_code, "variant_of")
 
 	if price_list:
