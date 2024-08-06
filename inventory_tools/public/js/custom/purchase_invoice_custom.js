@@ -26,9 +26,9 @@ function show_subcontracting_fields(frm) {
 		return
 	}
 	if (
-		frappe.boot.inventory_tools &&
-		frappe.boot.inventory_tools[frm.doc.company] &&
-		frappe.boot.inventory_tools[frm.doc.company].enable_work_order_subcontracting
+		frappe.boot.inventory_tools_settings &&
+		frappe.boot.inventory_tools_settings[frm.doc.company] &&
+		frappe.boot.inventory_tools_settings[frm.doc.company].enable_work_order_subcontracting
 	) {
 		unhide_field('subcontracting')
 		hide_field('update_stock')
@@ -189,9 +189,9 @@ function setup_item_queries(frm) {
 				filters['is_sub_contracted_item'] = 1
 			} else {
 				if (
-					frappe.boot.inventory_tools &&
-					frappe.boot.inventory_tools[frm.doc.company] &&
-					frappe.boot.inventory_tools[frm.doc.company].enable_work_order_subcontracting
+					frappe.boot.inventory_tools_settings &&
+					frappe.boot.inventory_tools_settings[frm.doc.company] &&
+					frappe.boot.inventory_tools_settings[frm.doc.company].enable_work_order_subcontracting
 				) {
 					filters['is_stock_item'] = 0
 				}

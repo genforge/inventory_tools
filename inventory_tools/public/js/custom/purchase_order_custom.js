@@ -32,9 +32,9 @@ function show_subcontracting_fields(frm) {
 		return
 	}
 	if (
-		frappe.boot.inventory_tools &&
-		frappe.boot.inventory_tools[frm.doc.company] &&
-		frappe.boot.inventory_tools[frm.doc.company].enable_work_order_subcontracting
+		frappe.boot.inventory_tools_settings &&
+		frappe.boot.inventory_tools_settings[frm.doc.company] &&
+		frappe.boot.inventory_tools_settings[frm.doc.company].enable_work_order_subcontracting
 	) {
 		unhide_field('subcontracting')
 		setTimeout(() => {
@@ -54,9 +54,9 @@ function setup_item_queries(frm) {
 				filters['is_sub_contracted_item'] = 1
 			} else {
 				if (
-					frappe.boot.inventory_tools &&
-					frappe.boot.inventory_tools[frm.doc.company] &&
-					frappe.boot.inventory_tools[frm.doc.company].enable_work_order_subcontracting
+					frappe.boot.inventory_tools_settings &&
+					frappe.boot.inventory_tools_settings[frm.doc.company] &&
+					frappe.boot.inventory_tools_settings[frm.doc.company].enable_work_order_subcontracting
 				) {
 					filters['is_stock_item'] = 0
 				}
@@ -105,11 +105,12 @@ function override_create_buttons(frm) {
 	let aggregated_purchasing_warehouse = undefined
 	if (
 		frm.doc.docstatus &&
-		frappe.boot.inventory_tools &&
-		frappe.boot.inventory_tools[frm.doc.company] &&
-		frappe.boot.inventory_tools[frm.doc.company].aggregated_purchasing_warehouse
+		frappe.boot.inventory_tools_settings &&
+		frappe.boot.inventory_tools_settings[frm.doc.company] &&
+		frappe.boot.inventory_tools_settings[frm.doc.company].aggregated_purchasing_warehouse
 	) {
-		aggregated_purchasing_warehouse = frappe.boot.inventory_tools[frm.doc.company].aggregated_purchasing_warehouse
+		aggregated_purchasing_warehouse =
+			frappe.boot.inventory_tools_settings[frm.doc.company].aggregated_purchasing_warehouse
 	}
 	if (!aggregated_purchasing_warehouse) {
 		frm.remove_custom_button('Purchase Invoice', 'Create')
@@ -244,9 +245,9 @@ async function get_items_data(frm) {
 	let items_data = []
 	if (
 		frm.doc.docstatus &&
-		frappe.boot.inventory_tools &&
-		frappe.boot.inventory_tools[frm.doc.company] &&
-		frappe.boot.inventory_tools[frm.doc.company].aggregated_purchasing_warehouse
+		frappe.boot.inventory_tools_settings &&
+		frappe.boot.inventory_tools_settings[frm.doc.company] &&
+		frappe.boot.inventory_tools_settings[frm.doc.company].aggregated_purchasing_warehouse
 	) {
 		items_data = frm.doc.items
 		items_data.forEach(row => {
