@@ -50,9 +50,11 @@ sed -i 's/redis_socketio:/# redis_socketio:/g' Procfile
 
 bench get-app hrms --branch "${BRANCH_NAME}" --skip-assets --overwrite
 bench get-app erpnext --branch "${BRANCH_NAME}" --skip-assets --overwrite
+bench get-app payments --branch "${BRANCH_NAME}" --skip-assets --overwrite
+bench get-app webshop --branch "${BRANCH_NAME}" --skip-assets --overwrite
 bench get-app inventory_tools "${GITHUB_WORKSPACE}" --skip-assets
 
-printf '%s\n' 'frappe' 'erpnext' 'hrms' 'inventory_tools' > ~/frappe-bench/sites/apps.txt
+printf '%s\n' 'frappe' 'erpnext' 'hrms' 'payments' 'webshop' 'inventory_tools' > ~/frappe-bench/sites/apps.txt
 bench setup requirements --python
 bench use test_site
 
@@ -66,5 +68,4 @@ echo "SITE LIST-APPS:"
 bench list-apps
 
 bench start &> bench_run_logs.txt &
-CI=Yes &
-bench execute 'inventory_tools.tests.setup.before_test'
+CI=Yes

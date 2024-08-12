@@ -24,12 +24,15 @@ def test_uom_enforcement_validation():
 
 @pytest.mark.order(41)
 def test_uom_enforcement_query():
-	inventory_tools_settings = frappe.get_doc(
-		"Inventory Tools Settings", frappe.defaults.get_defaults().get("company")
+	inventory_tools_settings = frappe.get_cached_doc(
+		"Inventory Tools Settings", "Ambrosia Pie Company"
 	)
 	inventory_tools_settings.enforce_uoms = True
 	inventory_tools_settings.save()
-	frappe.call(
+	inventory_tools_settings = frappe.get_cached_doc("Inventory Tools Settings", "Chelsea Fruit Co")
+	inventory_tools_settings.enforce_uoms = True
+	inventory_tools_settings.save()
+	response = frappe.call(
 		"frappe.desk.search.search_link",
 		**{
 			"doctype": "UOM",
@@ -39,8 +42,8 @@ def test_uom_enforcement_query():
 			"reference_doctype": "Purchase Order Item",
 		},
 	)
-	assert len(frappe.response.results) == 2
-	assert frappe.response.results[0].get("value") == "Nos"
-	assert frappe.response.results[0].get("description") == "1.0"
-	assert frappe.response.results[1].get("value") == "Box"
-	assert frappe.response.results[1].get("description") == "100.0"
+	assert len(response) == 2
+	assert response[0].get("value") == "Nos"
+	assert response[0].get("description") == "1.0"
+	assert response[1].get("value") == "Box"
+	assert response[1].get("description") == "100.0"

@@ -49,7 +49,7 @@ function setup_uom_enforcement(frm) {
 					}
 					return {
 						query: 'inventory_tools.inventory_tools.overrides.uom.uom_restricted_query',
-						filters: { parent: frm.doc.item_code },
+						filters: { parent: frm.doc.item_code, company: frm.doc?.company },
 					}
 				})
 			})
@@ -63,7 +63,7 @@ function setup_uom_enforcement(frm) {
 						}
 						return {
 							query: 'inventory_tools.inventory_tools.overrides.uom.uom_restricted_query',
-							filters: { parent: locals[cdt][cdn].item_code },
+							filters: { parent: locals[cdt][cdn].item_code, company: frm.doc?.company },
 						}
 					})
 				})

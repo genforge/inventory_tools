@@ -9,18 +9,27 @@ app_publisher = "AgriTheory"
 app_description = "Inventory Tools"
 app_email = "support@agritheory.dev"
 app_license = "MIT"
-required_apps = ["erpnext", "hrms"]
+required_apps = ["erpnext", "hrms", "webshop"]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/inventory_tools/css/inventory_tools.css"
-app_include_js = ["inventory_tools.bundle.js"]
+app_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
+app_include_js = [
+	"inventory_tools.bundle.js",
+	"/assets/inventory_tools/dist/js/inventory_tools.js",
+]
 
 # include js, css files in header of web template
-# web_include_css = "/assets/inventory_tools/css/inventory_tools.css"
-# web_include_js = "/assets/inventory_tools/js/inventory_tools.js"
+web_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
+web_include_js = [
+	"/assets/inventory_tools/dist/js/inventory_tools.js",
+]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "inventory_tools/public/scss/website"
@@ -123,6 +132,7 @@ override_doctype_class = {
 	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
 	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
 	"Workstation": "inventory_tools.inventory_tools.overrides.workstation.InventoryToolsWorkstation",
+	"Website Item": "inventory_tools.inventory_tools.overrides.website_item.InventoryToolsWebsiteItem",
 }
 
 
@@ -143,7 +153,10 @@ doc_events = {
 		],
 	},
 	"Item": {
-		"validate": ["inventory_tools.inventory_tools.overrides.uom.duplicate_weight_to_uom_conversion"],
+		"validate": [
+			"inventory_tools.inventory_tools.overrides.uom.duplicate_weight_to_uom_conversion",
+			"inventory_tools.inventory_tools.faceted_search.update_specification_attribute_values",
+		],
 	},
 	"Warehouse": {
 		"validate": ["inventory_tools.inventory_tools.overrides.warehouse.update_warehouse_path"]
@@ -187,6 +200,7 @@ doc_events = {
 override_whitelisted_methods = {
 	"erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry": "inventory_tools.inventory_tools.overrides.work_order.make_stock_entry",
 	"erpnext.stock.get_item_details.get_item_details": "inventory_tools.inventory_tools.overrides.purchase_order.get_item_details",
+	"webshop.webshop.api.get_product_filter_data": "inventory_tools.inventory_tools.faceted_search.get_product_filter_data",
 }
 
 
