@@ -43,8 +43,15 @@ repos:
         exclude: ^tests/
         args: [--ignore-missing-imports]
 
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli
+
   - repo: https://github.com/agritheory/test_utils
-    rev: v0.14.0
+    rev: v0.15.0
     hooks:
       - id: update_pre_commit_config
       - id: validate_copyright
