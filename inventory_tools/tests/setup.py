@@ -1,25 +1,24 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import datetime
 import shutil
-import types
-from itertools import groupby
-from pathlib import Path
-
 import frappe
-from erpnext.accounts.doctype.account.account import update_account_number
+from pathlib import Path
 from erpnext.manufacturing.doctype.production_plan.production_plan import (
 	get_items_for_material_requests,
 )
-from erpnext.setup.utils import enable_all_roles_and_domains, set_defaults_for_tests
-from erpnext.stock.get_item_details import get_item_details
+from erpnext.setup.utils import set_defaults_for_tests
 from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
-from frappe.utils import add_months, nowdate
-from frappe.utils.data import flt, getdate
+from frappe.utils.data import add_months, flt, getdate, nowdate, get_datetime
+from webshop.webshop.doctype.website_item.website_item import make_website_item
 
 from inventory_tools.tests.fixtures import (
 	boms,
 	customers,
 	items,
 	operations,
+	specifications,
 	suppliers,
 	workstations,
 )
@@ -107,6 +106,7 @@ def create_test_data():
 	create_production_plan(settings, prod_plan_from_doc)
 	create_fruit_material_request(settings)
 	create_quotations(settings)
+	create_specifications(settings)
 
 
 def create_suppliers(settings):
@@ -192,40 +192,46 @@ def setup_manufacturing_settings(settings):
 		"Inventory Tools Settings", settings.company, "enable_work_order_subcontracting", 1
 	)
 	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
+	frappe.set_value("Inventory Tools Settings", settings.company, "enforce_uoms", 1)
+	frappe.set_value(
+		"Inventory Tools Settings", settings.company, "allow_alternative_workstations", 1
+	)
+	frappe.set_value("Inventory Tools Settings", settings.company, "create_purchase_orders", 0)
 	frappe.set_value(
 		"Inventory Tools Settings", settings.company, "overproduction_percentage_for_work_order", 50
 	)
+	frappe.set_value("Inventory Tools Settings", settings.company, "show_on_website", 1)
+	frappe.set_value("Inventory Tools Settings", settings.company, "show_in_listview", 1)
 
 
 def create_workstations(settings):
-	fixtures_dir = (
-		Path(frappe.get_site_path()).resolve().parent.parent
-		/ "apps"
-		/ "inventory_tools"
-		/ "inventory_tools"
-		/ "tests"
-		/ "fixtures"
+  fixtures_dir = (
+	    Path(frappe.get_site_path()).resolve().parent.parent
+      / "apps"
+      / "inventory_tools"
+      / "inventory_tools"
+      / "tests"
+      / "fixtures"
 	)
-	if not frappe.db.exists("Plant Floor", "Kitchen"):
-		public_file_path = Path(frappe.get_site_path("public", "files", "floor_plan.png"))
-		shutil.copy((fixtures_dir / "floor_plan.png").resolve(), public_file_path.resolve())
-		pf = frappe.new_doc("Plant Floor")
-		pf.floor_name = "Kitchen"
-		pf.company = settings.company
-		pf.warehouse = "Kitchen - APC"
-		pf.plant_floor_layout = "/files/floor_plan.png"
-		pf.save()
-
+  if not frappe.db.exists("Plant Floor", "Kitchen"):
+      public_file_path = Path(frappe.get_site_path("public", "files", "floor_plan.png"))
+      shutil.copy((fixtures_dir / "floor_plan.png").resolve(), public_file_path.resolve())
+      pf = frappe.new_doc("Plant Floor")
+      pf.floor_name = "Kitchen"
+      pf.company = settings.company
+      pf.warehouse = "Kitchen - APC"
+      pf.plant_floor_layout = "/files/floor_plan.png"
+      pf.save()
 	for ws in workstations:
 		if frappe.db.exists("Workstation", ws[0]):
 			continue
-		public_file_path = Path(frappe.get_site_path("public", "files", ws[2]))
+    public_file_path = Path(frappe.get_site_path("public", "files", ws[2]))
 		shutil.copy((fixtures_dir / ws[2]).resolve(), public_file_path.resolve())
 		shutil.copy((fixtures_dir / ws[3]).resolve(), public_file_path.resolve())
 		work = frappe.new_doc("Workstation")
 		work.workstation_name = ws[0]
 		work.production_capacity = ws[1]
-		work.plant_floor = "Kitchen"
+    work.plant_floor = "Kitchen"
 		work.off_status_image = f"/files/{ws[2]}"
 		work.on_status_image = f"/files/{ws[3]}"
 		work.save()
@@ -265,6 +271,11 @@ def create_item_groups(settings):
 		ig.item_group_name = ig_name
 		ig.parent_item_group = "All Item Groups"
 		ig.save()
+
+	if not frappe.db.exists("Brand", "Ambrosia Pie Co"):
+		brand = frappe.new_doc("Brand")
+		brand.brand = "Ambrosia Pie Co"
+		brand.save()
 
 
 def create_price_lists(settings):
@@ -313,6 +324,8 @@ def create_items(settings):
 		i.valuation_rate = item.get("valuation_rate") or 0
 		i.is_sub_contracted_item = item.get("is_sub_contracted_item") or 0
 		i.default_warehouse = settings.get("warehouse")
+		i.weight_uom = item.get("weight_uom") if i.is_stock_item else None
+		i.weight_per_unit = item.get("weight_per_unit")
 		i.default_material_request_type = (
 			"Purchase"
 			if item.get("item_group") in ("Bakery Supplies", "Ingredients")
@@ -330,6 +343,9 @@ def create_items(settings):
 			else 0
 		)
 		i.is_sales_item = 1 if item.get("item_group") == "Baked Goods" else 0
+		i.sales_uom = "Nos" if i.is_sales_item else None
+		i.shelf_life_in_days = 7 if i.is_sales_item else None
+		i.brand = "Ambrosia Pie Co" if i.is_sales_item else None
 		i.append(
 			"item_defaults",
 			{
@@ -374,6 +390,11 @@ def create_items(settings):
 			)
 			se.save()
 			se.submit()
+		if i.is_sales_item:
+			website_item = make_website_item(i, True)
+			website_item = frappe.get_doc("Website Item", website_item[0])
+			website_item.route = f"products/{frappe.scrub(i.name)}"
+			website_item.save()
 
 
 def create_warehouses(settings):
@@ -643,12 +664,23 @@ def create_production_plan(settings, prod_plan_from_doc):
 		wo.wip_warehouse = "Kitchen - APC"
 		wo.save()
 		wo.submit()
-		# job_cards = frappe.get_all("Job Card", {"work_order": wo.name})
-		# for job_card in job_cards:
-		# 	job_card = frappe.get_doc("Job Card", job_card)
-		# 	job_card.time_logs[0].completed_qty = wo.qty
-		# 	job_card.save()
-		# 	job_card.submit()
+		job_cards = frappe.get_all("Job Card", {"work_order": wo.name})
+		start_time = get_datetime()
+		for job_card in job_cards:
+			job_card = frappe.get_doc("Job Card", job_card)
+			batch_size, total_operation_time = frappe.get_value(
+				"Operation", job_card.operation, ["batch_size", "total_operation_time"]
+			)
+			time_in_mins = (total_operation_time / batch_size) * wo.qty
+			job_card.append(
+				"time_logs",
+				{
+					"completed_qty": wo.qty,
+					"from_time": start_time,
+					"to_time": start_time + datetime.timedelta(minutes=time_in_mins),
+					"time_in_mins": time_in_mins,
+				},
+			)
 
 
 def create_fruit_material_request(settings):
@@ -780,3 +812,51 @@ def create_quotations(settings):
 	quotation.update(values)
 	quotation.save()
 	quotation.submit()
+
+
+def create_specifications(settings=None):
+	for c in (
+		("Red", "#E24C4C"),
+		("Blue", "#2490EF"),
+		("Purple", "#8684FF"),
+		("Green", "#8CCF54"),
+		("Yellow", "#FFFF00"),
+		("White", "#EEEEEE"),
+		("Black", "#111111"),
+	):
+		if not frappe.db.exists("Color", c[0]):
+			color = frappe.new_doc("Color")
+			color.name = c[0]
+			color.color = c[1]
+			color.save()
+
+	for spec in specifications:
+		if frappe.db.exists("Specification", spec.get("name")):
+			s = frappe.get_doc("Specification", spec.get("name"))
+		else:
+			s = frappe.new_doc("Specification")
+			s.name = spec.get("name")
+			s.dt = spec.get("dt")
+			s.apply_on = spec.get("apply_on")
+			s.enabled = spec.get("enabled")
+			for at in spec.get("attributes"):
+				s.append("attributes", at)
+			s.save()
+
+
+def create_demo_specification_values():
+	"""
+	run this if you need to manually create data for demoing faceted search
+	bench execute 'inventory_tools.tests.setup.create_demo_specification_values'
+	"""
+	from inventory_tools.tests.test_faceted_search import (
+		test_values_updated_on_item_save,
+		test_generate_values,
+		test_generate_values_on_overlapping_items,
+		test_manual_attribute_addition,
+	)
+
+	test_values_updated_on_item_save()
+	test_generate_values()
+	test_generate_values_on_overlapping_items()
+	test_manual_attribute_addition()

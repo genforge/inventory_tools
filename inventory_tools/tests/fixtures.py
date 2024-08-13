@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 suppliers = [
 	(
 		"Freedom Provisions",
@@ -201,6 +204,8 @@ items = [
 		"item_code": "Ambrosia Pie",
 		"item_group": "Baked Goods",
 		"uom": "Nos",
+		"weight_per_unit": 7.5,
+		"weight_uom": "Pound",
 		"item_price": 11.00,
 		"default_warehouse": "Refrigerated Display - APC",
 		"description": "<div><p>Ambrosia Pie is the marquee product of Ambrosia Pie Company. A filling of heavenly cloudberries pair perfectly with the tart hairless rambutan, finished with drizzles of tayberry nectar. It's a feast fit for Mt Olympus!</p></div>",
@@ -208,6 +213,8 @@ items = [
 	{
 		"item_code": "Double Plum Pie",
 		"uom": "Nos",
+		"weight_per_unit": 8,
+		"weight_uom": "Pound",
 		"item_group": "Baked Goods",
 		"item_price": 10.50,
 		"default_warehouse": "Refrigerated Display - APC",
@@ -216,6 +223,8 @@ items = [
 	{
 		"item_code": "Gooseberry Pie",
 		"uom": "Nos",
+		"weight_per_unit": 8.5,
+		"weight_uom": "Pound",
 		"item_group": "Baked Goods",
 		"item_price": 12.00,
 		"default_warehouse": "Refrigerated Display - APC",
@@ -225,6 +234,8 @@ items = [
 		"item_code": "Kaduka Key Lime Pie",
 		"item_group": "Baked Goods",
 		"uom": "Nos",
+		"weight_per_unit": 9,
+		"weight_uom": "Pound",
 		"item_price": 11.50,
 		"default_warehouse": "Refrigerated Display - APC",
 		"description": "<div><p>Take your tastebuds on an adventure with this whimsical twist on the classic Key Lime pie. Made with kaduka limes and the exotic limequat, this seasonal pie is sure to satisfy even the most weary culinary explorer. Grab it when you can - it's only available April through September.</p></div>",
@@ -344,6 +355,8 @@ items = [
 	{
 		"item_code": "Cloudberry",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Cloudberry",
 		"item_group": "Ingredients",
 		"item_price": 0.65,
@@ -353,6 +366,8 @@ items = [
 	{
 		"item_code": "Cocoplum",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Cocoplum",
 		"item_group": "Ingredients",
 		"item_price": 0.35,
@@ -362,6 +377,8 @@ items = [
 	{
 		"item_code": "Damson Plum",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Damson Plum",
 		"item_group": "Ingredients",
 		"item_price": 0.85,
@@ -371,6 +388,8 @@ items = [
 	{
 		"item_code": "Gooseberry",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Gooseberry",
 		"item_group": "Ingredients",
 		"item_price": 0.99,
@@ -380,6 +399,8 @@ items = [
 	{
 		"item_code": "Hairless Rambutan",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Hairless Rambutan",
 		"item_price": 0.50,
 		"item_group": "Ingredients",
@@ -389,6 +410,8 @@ items = [
 	{
 		"item_code": "Kaduka Lime",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Kaduka Lime",
 		"item_group": "Ingredients",
 		"item_price": 0.89,
@@ -398,6 +421,8 @@ items = [
 	{
 		"item_code": "Limequat",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Limequat",
 		"item_group": "Ingredients",
 		"item_price": 0.75,
@@ -407,6 +432,8 @@ items = [
 	{
 		"item_code": "Tayberry",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Tayberry",
 		"item_group": "Ingredients",
 		"item_price": 0.85,
@@ -416,6 +443,8 @@ items = [
 	{
 		"item_code": "Bayberry",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Bayberry",
 		"item_group": "Ingredients",
 		"item_price": 0.45,
@@ -425,6 +454,8 @@ items = [
 	{
 		"item_code": "Butter",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Butter",
 		"item_group": "Ingredients",
 		"item_price": 4.5,
@@ -437,6 +468,8 @@ items = [
 	{
 		"item_code": "Cornstarch",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Cornstarch",
 		"item_group": "Ingredients",
 		"item_price": 0.52,
@@ -446,6 +479,8 @@ items = [
 	{
 		"item_code": "Ice Water",
 		"uom": "Cup",
+		"weight_uom": "Pound",
+		"weight_per_unit": 0.52,
 		"description": "Ice Water - necessary for pie crusts",
 		"item_group": "Ingredients",
 		"item_price": 0.01,
@@ -456,6 +491,8 @@ items = [
 	{
 		"item_code": "Flour",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Flour",
 		"item_group": "Ingredients",
 		"item_price": 0.66,
@@ -488,10 +525,13 @@ items = [
 		"item_price": 0.02,
 		"default_warehouse": "Storeroom - APC",
 		"supplier": ["Freedom Provisions", "Unity Bakery Supply"],
+		"uom_conversion_detail": {"Box": 100},
 	},
 	{
 		"item_code": "Salt",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Salt",
 		"item_group": "Ingredients",
 		"item_price": 0.36,
@@ -501,6 +541,8 @@ items = [
 	{
 		"item_code": "Sugar",
 		"uom": "Pound",
+		"weight_uom": "Pound",
+		"weight_per_unit": 1,
 		"description": "Sugar",
 		"item_group": "Ingredients",
 		"item_price": 0.60,
@@ -510,6 +552,8 @@ items = [
 	{
 		"item_code": "Water",
 		"uom": "Cup",
+		"weight_uom": "Pound",
+		"weight_per_unit": 0.52,
 		"item_price": 0.05,
 		"description": "Water",
 		"item_group": "Ingredients",
@@ -1006,3 +1050,131 @@ customers = [
 	"TransAmerica Bank Cafeteria",
 	"Whole Harvest Grocery Group",
 ]
+
+specifications = [
+	{
+		"dt": "Item",
+		"name": "Items",
+		"apply_on": "",
+		"enabled": 1,
+		"attributes": [
+			{
+				"attribute_name": "Color",
+				"applied_on": "Item",
+				"component": "FacetedSearchColorPicker",
+			},
+			{
+				"attribute_name": "Weight",
+				"applied_on": "Item",
+				"field": "weight_per_unit",
+				"numeric_values": 1,
+				"component": "FacetedSearchNumericRange",
+			},
+			{
+				"attribute_name": "Brand",
+				"applied_on": "Item",
+				"field": "brand",
+				"component": "AttributeFilter",
+			},
+		],
+	},
+	{
+		"dt": "Item Group",
+		"name": "Baked Goods",
+		"apply_on": "Baked Goods",
+		"enabled": 1,
+		"attributes": [
+			{
+				"attribute_name": "Price",
+				"applied_on": "Item",
+				"numeric_values": 1,
+				"component": "FacetedSearchNumericRange",
+			},
+			{"attribute_name": "Fruits", "applied_on": "Item", "component": "AttributeFilter"},
+			{
+				"attribute_name": "Shelf Life",
+				"applied_on": "Item",
+				"field": "shelf_life_in_days",
+				"numeric_values": 1,
+				"component": "FacetedSearchNumericRange",
+			},
+			{
+				"attribute_name": "EOL",
+				"applied_on": "Item",
+				"field": "end_of_life",
+				"date_values": 1,
+				"component": "FacetedSearchDateRange",
+			},
+		],
+	},
+]
+
+
+attributes = {
+	"Ambrosia Pie": {
+		"Fruits": ["Hairless Rambutan", "Cloudberry", "Tayberry"],
+		"Price": 11.00,
+		"Color": ["Blue", "Red"],
+		"Brand": "Chelsea Fruit Co",
+	},
+	"Double Plum Pie": {
+		"Fruits": ["Cocoplum", "Damson Plum"],
+		"Price": 10.50,
+		"Color": ["Purple"],
+		"Brand": "Chelsea Fruit Co",
+	},
+	"Gooseberry Pie": {
+		"Fruits": "Gooseberry",
+		"Price": 12.00,
+		"Color": ["Yellow"],
+		"Brand": "Chelsea Fruit Co",
+	},
+	"Kaduka Key Lime Pie": {
+		"Fruits": ["Kaduka Lime", "Limequat"],
+		"Price": 11.50,
+		"Color": ["Green", "Yellow"],
+		"Brand": "Chelsea Fruit Co",
+	},
+	"Tayberry": {
+		"Color": ["Red"],
+	},
+	"Limequat": {
+		"Color": ["Yellow", "Green"],
+	},
+	"Kaduka Lime": {
+		"Color": ["Green"],
+	},
+	"Hairless Rambutan": {
+		"Color": ["Red"],
+	},
+	"Gooseberry": {
+		"Color": ["Yellow"],
+	},
+	"Damson Plum": {
+		"Color": ["Purple"],
+	},
+	"Cocoplum": {
+		"Color": ["Purple", "Black"],
+	},
+	"Bayberry": {
+		"Color": ["Red", "Green", "Blue"],
+	},
+	"Sugar": {
+		"Color": ["White"],
+	},
+	"Salt": {
+		"Color": ["White"],
+	},
+	"Flour": {
+		"Color": ["White"],
+	},
+	"Cornstarch": {
+		"Color": ["White"],
+	},
+	"Butter": {
+		"Color": ["Yellow"],
+	},
+	"Cloudberry": {
+		"Color": ["Yellow", "Red"],
+	},
+}

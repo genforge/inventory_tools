@@ -1,6 +1,9 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
+import json
 from pathlib import Path
 from unittest.mock import MagicMock
-import json
 
 import frappe
 import pytest

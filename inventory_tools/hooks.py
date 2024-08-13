@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 from . import __version__ as app_version
 
 app_name = "inventory_tools"
@@ -6,7 +9,7 @@ app_publisher = "AgriTheory"
 app_description = "Inventory Tools"
 app_email = "support@agritheory.dev"
 app_license = "MIT"
-required_apps = ["erpnext", "hrms"]
+required_apps = ["erpnext", "hrms", "webshop"]
 
 # Includes in <head>
 # ------------------
@@ -21,8 +24,12 @@ app_include_js = [
 ]
 
 # include js, css files in header of web template
-# web_include_css = "/assets/inventory_tools/css/inventory_tools.css"
-# web_include_js = "/assets/inventory_tools/js/inventory_tools.js"
+web_include_css = [
+	"/assets/inventory_tools/dist/js/style.css",
+]
+web_include_js = [
+	"/assets/inventory_tools/dist/js/inventory_tools.js",
+]
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "inventory_tools/public/scss/website"
@@ -36,13 +43,15 @@ app_include_js = [
 
 # include js in doctype views
 doctype_js = {
-	"Work Order": "public/js/work_order_custom.js",
-	"Purchase Order": "public/js/purchase_order_custom.js",
-	"Purchase Invoice": "public/js/purchase_invoice_custom.js",
-	"Stock Entry": "public/js/stock_entry_custom.js",
-	"Job Card": "public/js/job_card_custom.js",
-	"Operation": "public/js/operation_custom.js",
-	"Plant Floor": "public/js/plant_floor_custom.js",
+	"Item": "public/js/custom/item_custom.js",
+	"Job Card": "public/js/custom/job_card_custom.js",
+	"Operation": "public/js/custom/operation_custom.js",
+	"Purchase Invoice": "public/js/custom/purchase_invoice_custom.js",
+	"Purchase Order": "public/js/custom/purchase_order_custom.js",
+	"Stock Entry": "public/js/custom/stock_entry_custom.js",
+	"Work Order": "public/js/custom/work_order_custom.js",
+	"Workstation": "public/js/custom/workstation_custom.js",
+  "Plant Floor": "public/js/plant_floor_custom.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -89,7 +98,7 @@ after_migrate = "inventory_tools.customize.load_customizations"
 
 # Boot
 # ------------
-# extend_bootinfo = "inventory_tools.inventory_tools.boot.boot_session"
+extend_bootinfo = "inventory_tools.inventory_tools.boot.boot_session"
 
 
 # Desk Notifications
@@ -115,14 +124,16 @@ after_migrate = "inventory_tools.customize.load_customizations"
 # Override standard doctype classes
 
 override_doctype_class = {
-	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
+	"Job Card": "inventory_tools.inventory_tools.overrides.job_card.InventoryToolsJobCard",
+	"Production Plan": "inventory_tools.inventory_tools.overrides.production_plan.InventoryToolsProductionPlan",
 	"Purchase Invoice": "inventory_tools.inventory_tools.overrides.purchase_invoice.InventoryToolsPurchaseInvoice",
 	"Purchase Order": "inventory_tools.inventory_tools.overrides.purchase_order.InventoryToolsPurchaseOrder",
 	"Purchase Receipt": "inventory_tools.inventory_tools.overrides.purchase_receipt.InventoryToolsPurchaseReceipt",
-	"Production Plan": "inventory_tools.inventory_tools.overrides.production_plan.InventoryToolsProductionPlan",
-	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
-	"Job Card": "inventory_tools.inventory_tools.overrides.job_card.InventoryToolsJobCard",
 	"Sales Order": "inventory_tools.inventory_tools.overrides.sales_order.InventoryToolsSalesOrder",
+	"Stock Entry": "inventory_tools.inventory_tools.overrides.stock_entry.InventoryToolsStockEntry",
+	"Work Order": "inventory_tools.inventory_tools.overrides.work_order.InventoryToolsWorkOrder",
+	"Workstation": "inventory_tools.inventory_tools.overrides.workstation.InventoryToolsWorkstation",
+	"Website Item": "inventory_tools.inventory_tools.overrides.website_item.InventoryToolsWebsiteItem",
 }
 
 
@@ -143,7 +154,10 @@ doc_events = {
 		],
 	},
 	"Item": {
-		"validate": ["inventory_tools.inventory_tools.overrides.uom.duplicate_weight_to_uom_conversion"],
+		"validate": [
+			"inventory_tools.inventory_tools.overrides.uom.duplicate_weight_to_uom_conversion",
+			"inventory_tools.inventory_tools.faceted_search.update_specification_attribute_values",
+		],
 	},
 	"Warehouse": {
 		"validate": ["inventory_tools.inventory_tools.overrides.warehouse.update_warehouse_path"]
@@ -187,6 +201,7 @@ doc_events = {
 override_whitelisted_methods = {
 	"erpnext.manufacturing.doctype.work_order.work_order.make_stock_entry": "inventory_tools.inventory_tools.overrides.work_order.make_stock_entry",
 	"erpnext.stock.get_item_details.get_item_details": "inventory_tools.inventory_tools.overrides.purchase_order.get_item_details",
+	"webshop.webshop.api.get_product_filter_data": "inventory_tools.inventory_tools.faceted_search.get_product_filter_data",
 }
 
 
