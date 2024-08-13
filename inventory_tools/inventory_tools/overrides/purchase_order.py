@@ -225,7 +225,7 @@ def make_sales_invoices(docname: str, rows: list | str) -> None:
 @frappe.whitelist()
 def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=True):
 	"""
-	HASH: 59b9b7dc9185fee1814d5ef7d89d0875fead4bf7
+	HASH: 334c4d06766b67a4e35b4ec4fe99a9d8dc07691a
 	REPO: https://github.com/frappe/erpnext/
 	PATH: erpnext/stock/get_item_details.py
 	METHOD: get_item_details
@@ -243,7 +243,7 @@ def get_item_details(args, doc=None, for_validate=False, overwrite_warehouse=Tru
 @frappe.whitelist()
 def validate_item_details(args, item):
 	"""
-	HASH: 59b9b7dc9185fee1814d5ef7d89d0875fead4bf7
+	HASH: 334c4d06766b67a4e35b4ec4fe99a9d8dc07691a
 	REPO: https://github.com/frappe/erpnext/
 	PATH: erpnext/stock/get_item_details.py
 	METHOD: validate_item_details

@@ -9,6 +9,7 @@ class InventoryToolsSettings(Document):
 	def validate(self):
 		self.create_warehouse_path_custom_field()
 		self.validate_single_aggregation_company()
+		self.set_faceted_search_for_all_companies()
 
 	def create_warehouse_path_custom_field(self):
 		if frappe.db.exists("Custom Field", "Warehouse-warehouse_path"):
@@ -79,6 +80,13 @@ class InventoryToolsSettings(Document):
 						f"Sales Order Aggregation Company in {its.name} Inventory Tools Settings is set to {its.sales_order_aggregation_company}"
 					)
 
+	def set_faceted_search_for_all_companies(self):
+		for its in frappe.get_all("Inventory Tools Settings", pluck="name"):
+			if its == self.name:
+				continue
+			frappe.db.set_value("Inventory Tools Settings", its, "show_on_website", self.show_on_website)
+			frappe.db.set_value("Inventory Tools Settings", its, "show_in_listview", self.show_in_listview)
+
 
 @frappe.whitelist()
 def create_inventory_tools_settings(doc, method=None) -> None:
@@ -89,3 +97,12 @@ def create_inventory_tools_settings(doc, method=None) -> None:
 	its = frappe.new_doc("Inventory Tools Settings")
 	its.company = doc.name
 	its.save()
+
+
+@frappe.whitelist(allow_guest=True)
+def faceted_search_enabled():
+	its = frappe.get_last_doc("Inventory Tools Settings")
+	return {
+		"show_on_website": its.show_on_website,
+		"show_in_listview": its.show_in_listview,
+	}

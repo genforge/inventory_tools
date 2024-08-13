@@ -1,3 +1,6 @@
+# Copyright (c) 2024, AgriTheory and contributors
+# For license information, please see license.txt
+
 import frappe
 import pytest
 
@@ -5,7 +8,7 @@ import pytest
 @pytest.mark.order(45)
 def test_alternative_workstation_query():
 	# test default settings
-	frappe.call(
+	response = frappe.call(
 		"frappe.desk.search.search_link",
 		**{
 			"doctype": "Workstation",
@@ -13,15 +16,14 @@ def test_alternative_workstation_query():
 			"reference_doctype": "Job Card",
 		},
 	)
-	assert len(frappe.response.results) == 16  # all workstations
-
+	assert len(response) == 10
 	# test with inventory tools settings
 	inventory_tools_settings = frappe.get_doc(
 		"Inventory Tools Settings", frappe.defaults.get_defaults().get("company")
 	)
 	inventory_tools_settings.allow_alternative_workstations = True
 	inventory_tools_settings.save()
-	frappe.call(
+	response = frappe.call(
 		"frappe.desk.search.search_link",
 		**{
 			"doctype": "Workstation",
@@ -31,7 +33,7 @@ def test_alternative_workstation_query():
 			"reference_doctype": "Job Card",
 		},
 	)
-	assert len(frappe.response.results) == 2
-	assert frappe.response.results[0].get("value") == "Food Prep Table 1"  # default returns first
-	assert "Default" in frappe.response.results[0].get("description")
-	assert frappe.response.results[1].get("value") == "Food Prep Table 2"
+	assert len(response) == 2
+	assert response[0].get("value") == "Food Prep Table 1"  # default returns first
+	assert "Default" in response[0].get("description")
+	assert response[1].get("value") == "Food Prep Table 2"

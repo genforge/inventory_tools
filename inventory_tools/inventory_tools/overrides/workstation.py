@@ -101,7 +101,7 @@ def get_alternative_workstations(doctype, txt, searchfield, start, page_len, fil
 
 	operation = filters.get("operation")
 	if not operation:
-		frappe.throw("Please select a Operation first.")
+		frappe.throw(frappe._("Please select a Operation first."))
 
 	searchfields = list(reversed(frappe.get_meta(doctype).get_search_fields()))
 	select = ",\n".join([f"`tabWorkstation`.{field}" for field in searchfields])
@@ -124,10 +124,11 @@ def get_alternative_workstations(doctype, txt, searchfield, start, page_len, fil
 		"Workstation", default_workstation_name, searchfields, as_dict=True
 	)
 	if default_workstation_name not in [row[0] for row in workstation]:
+		field_values = ",".join([v for k, v in default_workstation_fields[0].items() if k != "name"])
 		_default = tuple(
 			[
 				default_workstation_fields[0].name,
-				f"{frappe.bold('Default')} - {','.join([v for k, v in default_workstation_fields[0].items() if k != 'name'])}",
+				f"{frappe._('(Default Workstation)')} {' - ' if field_values else '' }{field_values}",
 			]
 		)
 		workstation.insert(0, _default)

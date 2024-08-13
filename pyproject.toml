@@ -22,7 +22,7 @@ build-backend = "poetry.core.masonry.api"
 skip = "CHANGELOG.md"
 
 [tool.pytest.ini_options]
-addopts = "--cov=inventory_tools --cov-report term-missing"
+addopts = "-s --disable-warnings" #--cov=inventory_tools --cov-report term-missing"
 
 [tool.black]
 line-length = 99

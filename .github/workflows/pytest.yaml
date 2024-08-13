@@ -87,6 +87,11 @@ jobs:
           MYSQL_PWD: 'admin'
         run: bash ${{ github.workspace }}/.github/helper/install.sh
 
+      - name: Install Test Fixtures
+        working-directory: /home/runner/frappe-bench
+        run: |
+          bench execute 'inventory_tools.tests.setup.before_test'
+
       - name: Run Tests
         working-directory: /home/runner/frappe-bench
         run: |
