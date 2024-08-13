@@ -51,7 +51,7 @@ doctype_js = {
 	"Stock Entry": "public/js/custom/stock_entry_custom.js",
 	"Work Order": "public/js/custom/work_order_custom.js",
 	"Workstation": "public/js/custom/workstation_custom.js",
-  "Plant Floor": "public/js/plant_floor_custom.js",
+	"Plant Floor": "public/js/custom/plant_floor_custom.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
