@@ -205,33 +205,33 @@ def setup_manufacturing_settings(settings):
 
 
 def create_workstations(settings):
-  fixtures_dir = (
-	    Path(frappe.get_site_path()).resolve().parent.parent
-      / "apps"
-      / "inventory_tools"
-      / "inventory_tools"
-      / "tests"
-      / "fixtures"
-	)
-  if not frappe.db.exists("Plant Floor", "Kitchen"):
-      public_file_path = Path(frappe.get_site_path("public", "files", "floor_plan.png"))
-      shutil.copy((fixtures_dir / "floor_plan.png").resolve(), public_file_path.resolve())
-      pf = frappe.new_doc("Plant Floor")
-      pf.floor_name = "Kitchen"
-      pf.company = settings.company
-      pf.warehouse = "Kitchen - APC"
-      pf.plant_floor_layout = "/files/floor_plan.png"
-      pf.save()
+	fixtures_dir = (
+		Path(frappe.get_site_path()).resolve().parent.parent
+		/ "apps"
+		/ "inventory_tools"
+		/ "inventory_tools"
+		/ "tests"
+		/ "fixtures"
+		)
+	if not frappe.db.exists("Plant Floor", "Kitchen"):
+		public_file_path = Path(frappe.get_site_path("public", "files", "floor_plan.png"))
+		shutil.copy((fixtures_dir / "floor_plan.png").resolve(), public_file_path.resolve())
+		pf = frappe.new_doc("Plant Floor")
+		pf.floor_name = "Kitchen"
+		pf.company = settings.company
+		pf.warehouse = "Kitchen - APC"
+		pf.plant_floor_layout = "/files/floor_plan.png"
+		pf.save()
 	for ws in workstations:
 		if frappe.db.exists("Workstation", ws[0]):
 			continue
-    public_file_path = Path(frappe.get_site_path("public", "files", ws[2]))
+		public_file_path = Path(frappe.get_site_path("public", "files", ws[2]))
 		shutil.copy((fixtures_dir / ws[2]).resolve(), public_file_path.resolve())
 		shutil.copy((fixtures_dir / ws[3]).resolve(), public_file_path.resolve())
 		work = frappe.new_doc("Workstation")
 		work.workstation_name = ws[0]
 		work.production_capacity = ws[1]
-    work.plant_floor = "Kitchen"
+		work.plant_floor = "Kitchen"
 		work.off_status_image = f"/files/{ws[2]}"
 		work.on_status_image = f"/files/{ws[3]}"
 		work.save()
