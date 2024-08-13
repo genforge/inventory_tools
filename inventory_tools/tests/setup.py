@@ -212,7 +212,7 @@ def create_workstations(settings):
 		/ "inventory_tools"
 		/ "tests"
 		/ "fixtures"
-		)
+	)
 	if not frappe.db.exists("Plant Floor", "Kitchen"):
 		public_file_path = Path(frappe.get_site_path("public", "files", "floor_plan.png"))
 		shutil.copy((fixtures_dir / "floor_plan.png").resolve(), public_file_path.resolve())

@@ -4,25 +4,21 @@
 		ref="plant_floor_layout"
 		:style="{
 			'background-image': `url(${frm.doc.plant_floor_layout})`,
-			'width': '100%',
+			width: '100%',
 			// 'height': plant_floor_layout_height,
 			// 'min-height': plant_floor_layout_height,
 			'background-position': 'center',
 			'background-repeat': 'no-repeat',
 			'background-size': 'contain',
-		}"
-	>
-	<canvas
-		style="width: 100%; height: 100%"
-		ref="diagram"
-	></canvas>
+		}">
+		<canvas style="width: 100%; height: 100%" ref="diagram"></canvas>
 	</div>
 </template>
 <script setup>
 import { computed, onMounted, ref, markRaw, watch, unref } from 'vue'
-import { useElementSize, useResizeObserver} from '@vueuse/core'
+import { useElementSize, useResizeObserver } from '@vueuse/core'
 // import { Canvas, Rect } from 'fabric'; // browser
-import * as fabric from 'fabric';
+import * as fabric from 'fabric'
 // import { StaticCanvas, Rect } from 'fabric/node'; // node
 
 let plant_floor_layout = ref(null)
@@ -33,10 +29,10 @@ let frm = computed(() => {
 })
 
 let plant_floor_layout_height = computed(() => {
-	useResizeObserver(plant_floor_layout, (entries) => {
+	useResizeObserver(plant_floor_layout, entries => {
 		const entry = entries[0]
 		const dimensions = entry.contentRect
-		return `${dimensions.width.value * .78}px`
+		return `${dimensions.width.value * 0.78}px`
 	})
 })
 
@@ -47,11 +43,9 @@ onMounted(() => {
 	const rect = new fabric.Rect({
 		fill: 'red',
 		width: 20,
-		height: 20
+		height: 20,
 	})
 	canvas.add(markRaw(rect))
 })
-
-
 </script>
 <style scoped></style>
