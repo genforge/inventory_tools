@@ -101,4 +101,4 @@ jobs:
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: /home/runner/frappe-bench/apps/inventory_tools/pytest-coverage.txt
-          junitxml-path: /home/runner/frappe-bench/apps/inventory_tools/coverage.xml
+          pytest-xml-coverage-path: /home/runner/frappe-bench/apps/inventory_tools/coverage.xml
